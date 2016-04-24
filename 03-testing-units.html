@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: Testing</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">Testing</h1></a>
+          <h2 class="subtitle">Unit Tests</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="learning-objectives"><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>Understand that functions are the atomistic unit of software.</li>
+<li>Understand that simpler units are easier to test than complex ones.</li>
+<li>Understand how to write a single unit test.</li>
+<li>Understand how to run a single unit test.</li>
+</ul>
+</div>
+</section>
+<p>In the previous section, we have included assertions directly in the code of the function. We have even (as part of the exercise) included code that checks some properties of the result. However, if this were our only approach to testing, we’d have two problems:</p>
+<ol style="list-style-type: decimal">
+<li>We are still not sure the result is actually correct! We cannot test the correctness of the solution in the function itself, because for that we’d need a solution for all possible inputs – if we already had this, we’d not need the function in the first place…</li>
+<li>We do not know whether the code works before we actually run it. The assertions might guard us against incorrect results (which is already great) but it would be better to have some more confidence in our code before we, say, run it overnight to analyse our data.</li>
+</ol>
+<p>This is where unit tests come in. Unit tests are so called because they exercise the functionality of the code by interrogating individual functions and methods. Fuctions and methods can often be considered the atomic units of software because they are indivisble. However, what is considered to be the smallest code <em>unit</em> is subjective. The body of a function can be long or short, and shorter functions are arguably more unit-like than long ones.</p>
+<p>Thus what reasonably constitutes a code unit typically varies from project to project and language to language. A good guideline is that if the code cannot be made any simpler logically (you cannot split apart the addition operator) or practically (a function is self-contained and well defined), then it is a unit.</p>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h2 id="functions-are-like-paragraphs"><span class="glyphicon glyphicon-pushpin"></span>Functions are Like Paragraphs</h2>
+</div>
+<div class="panel-body">
+<p>Recall that humans can only hold a few ideas in our heads at once. Paragraphs in books, for example, become unwieldy after a few lines. Functions, generaly, shouldn’t be longer than paragraphs. Robert C. Martin, the author of “Clean Code” said : “The first rule of functions is that <em>they should be small</em>. The second rule of functions is that <em>they should be smaller than that</em>.”</p>
+</div>
+</aside>
+<p>The desire to unit test code often has the effect of encouraging both the code and the tests to be as small, well-defined, and modular as possible.<br />In Python, unit tests typically take the form of test functions that call and make assertions about methods and functions in the code base. To run these test functions, a test framework is often required to collect them together. For now, we’ll write some tests for the rescale function and simply run them individually to see whether they fail. In the next session, we’ll use a test framework to collect and run them.</p>
+<h2 id="unit-tests-are-just-functions">Unit Tests Are Just Functions</h2>
+<p>Unit tests are typically made of three pieces, sometimes called “given, when, then”: <em>Given</em> some data, <em>when</em> an action is performed <em>then</em> the result should be as expected. The first step therefore consists of setting the stage (which can be as simple as creating a numpy array with some data, but could also mean creating a test file). The second steps usually calls the function that is tested on the prepared data and the third step consists of checking our expectations about the results using assertions. Let’s use this to test our rescale function:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> test_rescale():
+    data = numpy.array([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>])
+    rescaled = rescale(data)
+    expected = numpy.array([<span class="fl">0.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>])
+    assert_allclose(rescaled, expected)</code></pre>
+<p>The test above: - sets up the input parameters (the array [1.0, 2.0, 3.0]). - collects the observed result - declares the expected result (calculated with our human brain). - and compares the two with an assertion.</p>
+<p>A unit test suite is made up of many tests just like this one. A single implemented function may be tested in numerous ways.</p>
+<p>When writing such unit tests, special care should be taken to test <em>edge cases</em>, i.e. what happens at the boundaries of the input space. A function may assume a positive value for one of its argument, but what happens if it is 0? Or negative? Another typical edge case is an empty list or array as an argument. Often you will think about those cases only when writing the tests which then forces you to make a decision about how to handle the edge case (which you should then of course include in your function documentation). For example, what should <code>rescale</code> do for an empty array, should it raise an error or should it maybe rather return another empty array?</p>
+<section class="challenge panel panel-success">
+<div class="panel-heading">
+<h2 id="write-a-file-full-of-tests"><span class="glyphicon glyphicon-pencil"></span>Write a File Full of Tests</h2>
+</div>
+<div class="panel-body">
+<ol style="list-style-type: decimal">
+<li><p>In a file called <code>test_rescale.py</code>, write several tests like the <code>test_rescale</code> function from above (name every test function <code>test_…</code>). Try to test what you think is the most important</p></li>
+<li><p>Import <code>test_rescale</code> and run its tests.</p></li>
+</ol>
+</div>
+</section>
+<p>Well, running all those tests manually was tediuous…</p>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/paris-swc/python-testing-debugging-profiling">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="http://software-carpentry.org/v5/js/jquery-1.9.1.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>

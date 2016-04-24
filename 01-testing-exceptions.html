@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: Testing</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">Testing</h1></a>
+          <h2 class="subtitle">Exceptions</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="learning-objectives"><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>Learn when and how to raise exceptions in your own code</li>
+<li>Understand “re-raising” an exception</li>
+</ul>
+</div>
+</section>
+<p>Exceptions are the standard error messaging system in most modern programming languages. When an error is encountered, an informative exception is ‘thrown’ or ‘raised’. When we program in Python, we encounter such exceptions all the time, but we can also raise them from our own code. One of the main use cases is argument checking: when a function receives input that does not make sense, it should raise an error to inform the user (ideally with a clear error message) instead of just going on and producing non-sensical results.</p>
+<p>For example, consider the following function that rescales a numpy array to a given range:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    (Linearly) rescale the data so that it fits into the given range.</span>
+
+<span class="co">    Parameters</span>
+<span class="co">    ----------</span>
+<span class="co">    data : ndarray</span>
+<span class="co">        The data to rescale.</span>
+<span class="co">    lower : number, optional</span>
+<span class="co">        The lower bound for the data. Defaults to 0.</span>
+<span class="co">    upper : number, optional</span>
+<span class="co">        The upper bound for the data. Defaults to 1.</span>
+
+<span class="co">    Returns</span>
+<span class="co">    -------</span>
+<span class="co">    rescaled : ndarray</span>
+<span class="co">        The data rescaled between ``lower`` and ``upper``.</span>
+<span class="co">    &quot;&quot;&quot;</span>
+    data_min = numpy.<span class="dt">min</span>(data)
+    data_max = numpy.<span class="dt">max</span>(data)
+    normalized_data = (data - data_min) / (data_max - data_min)
+    rescaled_data = lower + upper * normalized_data
+    <span class="kw">return</span> rescaled_data</code></pre>
+<p>What is this function supposed to do for an array where all elements are identical? If we don’t handle this case, we will not get any error message but a “not-a-number” result because of the division by zero, together with a somewhat cryptical warning from numpy:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="dt">print</span>(rescale(numpy.array([<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>])))</code></pre>
+<pre class="output"><code>[...]/lib/python3.5/site-packages/ipykernel/__main__.py:21: RuntimeWarning: invalid value encountered in true_divide
+[ nan,  nan,  nan]</code></pre>
+<p>Imagine that we use the <code>rescale</code> function as part of a complex analysis script – in the end we might end up with a lot of <code>nan</code> values not knowing where they came from.</p>
+<p>So instead, let’s handle that case explicitly and raise a <code>ValueError</code> (a built-in error class for “an argument that has the right type but an inappropriate value”):</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
+    data_min = numpy.<span class="dt">min</span>(data)
+    data_max = numpy.<span class="dt">max</span>(data)
+    <span class="kw">if</span> not data_max &gt; data_min:
+        <span class="kw">raise</span> <span class="ot">ValueError</span>(<span class="st">&#39;Cannot rescale data: all values are identical.&#39;</span>)
+    normalized_data = (data - data_min) / (data_max - data_min)
+    rescaled_data = lower + upper * normalized_data
+    <span class="kw">return</span> rescaled_data</code></pre>
+<p>Once an exception is raised, it will be passed upward in the program scope:</p>
+<pre class="sourceCode python"><code class="sourceCode python">rescaled = rescale(numpy.array([<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>]))</code></pre>
+<pre class="output"><code>---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+&lt;ipython-input-21-8f4a617cc5ab&gt; in &lt;module&gt;()
+----&gt; 1 rescale(numpy.array([1, 1, 1]))
+
+&lt;ipython-input-20-032c2e2b8094&gt; in rescale(data, lower, upper)
+     20     data_max = numpy.max(data)
+     21     if not data_max &gt; data_min:
+---&gt; 22         raise ValueError(&#39;Cannot rescale data: all values are identical.&#39;)
+     23     normalized_data = (data - data_min) / (data_max - data_min)
+     24     rescaled_data = lower + upper * normalized_data
+
+ValueError: Cannot rescale data: all values are identical.</code></pre>
+<p>An exception can be used to trigger additional error messages or an alternative behavior. Rather than immediately halting code execution, the exception can be ‘caught’ upstream with a try-except block. When wrapped in a try-except block, the exception can be intercepted before it reaches global scope and halts execution.</p>
+<p>To add information or replace the message before it is passed upstream, the try-catch block can be used to catch-and-reraise the exception. We can use this at the beginning of our function. Note that trying to calculate the minimum of an empty array will raise a <code>ValueError</code>:</p>
+<pre class="sourceCode python"><code class="sourceCode python">empty_array = numpy.array([])
+<span class="dt">print</span>(numpy.<span class="dt">min</span>(empty_array))</code></pre>
+<pre class="output"><code>---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+&lt;ipython-input-26-bfb6cf9e1059&gt; in &lt;module&gt;()
+      1 empty_array = numpy.array([])
+----&gt; 2 print(numpy.min(empty_array))
+
+[...]/lib/python3.5/site-packages/numpy/core/_methods.py in _amin(a, axis, out, keepdims)
+     27
+     28 def _amin(a, axis=None, out=None, keepdims=False):
+---&gt; 29     return umr_minimum(a, axis, None, out, keepdims)
+     30
+     31 def _sum(a, axis=None, dtype=None, out=None, keepdims=False):
+
+ValueError: zero-size array to reduction operation minimum which has no identity</code></pre>
+<p>This error message is rather cryptic and someone (ourselves included) accidentally calling the <code>rescale</code> function with an empty array will probably not directly see the problem:</p>
+<pre class="sourceCode python"><code class="sourceCode python">rescaled = rescale(empty_array)</code></pre>
+<pre class="output"><code>---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+&lt;ipython-input-28-138793fc8d38&gt; in &lt;module&gt;()
+----&gt; 1 rescaled = rescale(empty_array)
+
+&lt;ipython-input-20-032c2e2b8094&gt; in rescale(data, lower, upper)
+     17         The data rescaled between ``lower`` and ``upper``.
+     18     &quot;&quot;&quot;
+---&gt; 19     data_min = numpy.min(data)
+     20     data_max = numpy.max(data)
+     21     if not data_max &gt; data_min:
+
+[...]]/lib/python3.5/site-packages/numpy/core/_methods.py in _amin(a, axis, out, keepdims)
+     27
+     28 def _amin(a, axis=None, out=None, keepdims=False):
+---&gt; 29     return umr_minimum(a, axis, None, out, keepdims)
+     30
+     31 def _sum(a, axis=None, dtype=None, out=None, keepdims=False):
+
+ValueError: zero-size array to reduction operation minimum which has no identity</code></pre>
+<p>We can catch this exception and provide a more “friendly” error message:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
+    <span class="kw">try</span>:
+        data_min = numpy.<span class="dt">min</span>(data)
+    <span class="kw">except</span> <span class="ot">ValueError</span>:
+        <span class="kw">raise</span> <span class="ot">ValueError</span>(<span class="st">&#39;Could not calculate the minimum of the input data -- maybe it is empty?&#39;</span>)
+    data_max = numpy.<span class="dt">max</span>(data)
+    <span class="kw">if</span> not data_max &gt; data_min:
+        <span class="kw">raise</span> <span class="ot">ValueError</span>(<span class="st">&#39;Cannot rescale data: all values are identical.&#39;</span>)
+    normalized_data = (data - data_min) / (data_max - data_min)
+    rescaled_data = lower + upper * normalized_data
+    <span class="kw">return</span> rescaled_data</code></pre>
+<p>Now the problem should be clear and at the same time we don’t lose any information about the original error:</p>
+<pre class="sourceCode python"><code class="sourceCode python">rescaled = rescale(empty_array)</code></pre>
+<pre class="output"><code>---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+&lt;ipython-input-29-addc726e55bb&gt; in rescale(data, lower, upper)
+     19     try:
+---&gt; 20         data_min = numpy.min(data)
+     21     except ValueError:
+
+[...]/lib/python3.5/site-packages/numpy/core/_methods.py in _amin(a, axis, out, keepdims)
+     28 def _amin(a, axis=None, out=None, keepdims=False):
+---&gt; 29     return umr_minimum(a, axis, None, out, keepdims)
+     30
+
+ValueError: zero-size array to reduction operation minimum which has no identity
+
+During handling of the above exception, another exception occurred:
+
+ValueError                                Traceback (most recent call last)
+&lt;ipython-input-30-138793fc8d38&gt; in &lt;module&gt;()
+----&gt; 1 rescaled = rescale(empty_array)
+
+&lt;ipython-input-29-addc726e55bb&gt; in rescale(data, lower, upper)
+     20         data_min = numpy.min(data)
+     21     except ValueError:
+---&gt; 22         raise ValueError(&#39;Could not calculate the minimum of the input data -- maybe it is empty?&#39;)
+     23     data_max = numpy.max(data)
+     24     if not data_max &gt; data_min:
+
+ValueError: Could not calculate the minimum of the input data -- maybe it is empty?</code></pre>
+<p>Alternatively, the exception can simply be handled intelligently. If an alternative behavior is preferred, the exception can be disregarded and a responsive behavior can be implemented like so:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
+    <span class="kw">try</span>:
+        data_min = numpy.<span class="dt">min</span>(data)
+    <span class="kw">except</span> <span class="ot">ValueError</span>:
+        <span class="kw">return</span> numpy.array([])
+    data_max = data.<span class="dt">max</span>()
+    <span class="kw">if</span> not data_max &gt; data_min:
+        <span class="kw">raise</span> <span class="ot">ValueError</span>(<span class="st">&#39;Cannot rescale data: all values are identical.&#39;</span>)
+    normalized_data = (data - data_min) / (data_max - data_min)
+    rescaled_data = lower + upper * normalized_data
+    <span class="kw">return</span> rescaled_data</code></pre>
+<p>If a single function might raise more than one type of exception, each can be caught and handled separately.</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
+    <span class="kw">try</span>:
+        data_min = numpy.<span class="dt">min</span>(data)
+    <span class="kw">except</span> <span class="ot">ValueError</span>:
+        <span class="kw">return</span> numpy.array([])
+    <span class="kw">except</span> <span class="ot">TypeError</span>:
+      <span class="kw">raise</span> <span class="ot">TypeError</span>(<span class="st">&#39;Can only re-scale numerical data.&#39;</span>)
+    data_max = numpy.<span class="dt">max</span>(data)
+    <span class="kw">if</span> not data_max &gt; data_min:
+        <span class="kw">raise</span> <span class="ot">ValueError</span>(<span class="st">&#39;Cannot rescale data: all values are identical.&#39;</span>)
+    normalized_data = (data - data_min) / (data_max - data_min)
+    rescaled_data = lower + upper * normalized_data
+    <span class="kw">return</span> rescaled_data</code></pre>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="dt">print</span>(<span class="st">&#39;rescaled empty array: &#39;</span>, rescale(empty_array))
+<span class="dt">print</span>(<span class="st">&#39;rescaled non-numerical array:&#39;</span>, rescale(numpy.array([<span class="st">&#39;not&#39;</span>, <span class="st">&#39;numbers&#39;</span>])))</code></pre>
+<pre class="output"><code>rescaled empty array:  []
+
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+&lt;ipython-input-31-76a2830c5c37&gt; in rescale(data, lower, upper)
+     19     try:
+---&gt; 20         data_min = numpy.min(data)
+     21     except ValueError:
+
+/home/marcel/anaconda/envs/swc_lesson/lib/python3.5/site-packages/numpy/core/fromnumeric.py in amin(a, axis, out, keepdims)
+   2358         return _methods._amin(a, axis=axis,
+-&gt; 2359                               out=out, keepdims=keepdims)
+   2360
+
+/home/marcel/anaconda/envs/swc_lesson/lib/python3.5/site-packages/numpy/core/_methods.py in _amin(a, axis, out, keepdims)
+     28 def _amin(a, axis=None, out=None, keepdims=False):
+---&gt; 29     return umr_minimum(a, axis, None, out, keepdims)
+     30
+
+TypeError: cannot perform reduce with flexible type
+
+During handling of the above exception, another exception occurred:
+
+TypeError                                 Traceback (most recent call last)
+&lt;ipython-input-39-6122b616c671&gt; in &lt;module&gt;()
+      1 print(&#39;rescaled empty array: &#39;, rescale(empty_array))
+----&gt; 2 print(&#39;rescaled non-numerical array:&#39;, rescale(numpy.array([&#39;not&#39;, &#39;numbers&#39;])))
+
+&lt;ipython-input-31-76a2830c5c37&gt; in rescale(data, lower, upper)
+     22         return numpy.array([])
+     23     except TypeError:
+---&gt; 24         raise TypeError(&#39;Can only re-scale numerical data.&#39;)
+     25     data_max = numpy.max(data)
+     26     if not data_max &gt; data_min:
+
+TypeError: Can only re-scale numerical data.</code></pre>
+<section class="challenge panel panel-success">
+<div class="panel-heading">
+<h2 id="checking-or-trying"><span class="glyphicon glyphicon-pencil"></span>Checking or trying?</h2>
+</div>
+<div class="panel-body">
+<p>What is the advantage of using <code>try</code>/<code>except</code> over an explicit type check? Compare these two functions that return the minimum and maximum as a tuple:</p>
+<pre><code>def minmax1(data):
+   try:
+       data_min = numpy.min(data)
+       data_max = numpy.max(data)
+   except TypeError:
+       raise TypeError(&#39;Need numerical data.&#39;)
+   return (data_min, data_max)
+
+def minmax2(data):
+   if not isinstance(data, numpy.ndarray):
+       raise TypeError(&#39;Need numerical data.&#39;)
+   data_min = numpy.min(data)
+   data_max = numpy.max(data)
+   return (data_min, data_max)</code></pre>
+<p>Hint: Could the input <code>data</code> be something else than a numpy array and still be meaningful?</p>
+</div>
+</section>
+<section class="challenge panel panel-success">
+<div class="panel-heading">
+<h2 id="catch-all"><span class="glyphicon glyphicon-pencil"></span>Catch all</h2>
+</div>
+<div class="panel-body">
+<p>Sometimes it is not obvious what type of exception to catch and an easy solution seems to be to catch <em>any</em> exception with <code>except Exception</code>. Why is this not a good idea?</p>
+</div>
+</section>
+<p>Exceptions can be very helpful to the user. However, for checking the internal consistency of an algorithm, a simpler mechanism called <em>assertions</em> can be used.</p>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/paris-swc/python-testing-debugging-profiling">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="http://software-carpentry.org/v5/js/jquery-1.9.1.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: Testing</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">Testing</h1></a>
+          <h2 class="subtitle">Assertions</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="learning-objectives"><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>Assertions are one line tests embedded in code.</li>
+<li>Assertions can halt execution if something unexpected happens.</li>
+<li>Assertions are the building blocks of tests.</li>
+</ul>
+</div>
+</section>
+<p>Assertions are the simplest type of test. They are used as a tool for bounding acceptable behavior during runtime. The assert keyword in python has the following behavior:</p>
+<pre class="sourceCode python"><code class="sourceCode python">x = <span class="dv">3</span>
+<span class="kw">assert</span> x != <span class="dv">3</span></code></pre>
+<pre class="output"><code>---------------------------------------------------------------------------
+AssertionError                            Traceback (most recent call last)
+&lt;ipython-input-49-f14d9f94696e&gt; in &lt;module&gt;()
+      1 x = 3
+----&gt; 2 assert x != 3
+
+AssertionError:</code></pre>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">assert</span> x == <span class="dv">3</span></code></pre>
+<pre class="output"><code></code></pre>
+<p>That is, assertions halt code execution instantly if the comparison is false. It does nothing at all if the comparison is true. These are therefore a very good tool for checking our whether everything is going according to our expectations. Let’s reuse our <code>rescale</code> function from before:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
+    data_min = numpy.<span class="dt">min</span>(data)
+    data_max = numpy.<span class="dt">max</span>(data)
+    <span class="kw">if</span> not data_max &gt; data_min:
+      <span class="kw">raise</span> <span class="ot">ValueError</span>(<span class="st">&#39;Cannot rescale data: all values are identical.&#39;</span>)
+    normalized_data = (data - data_min) / (data_max - data_min)
+    rescaled_data = lower + upper * normalized_data
+    <span class="kw">return</span> rescaled_data</code></pre>
+<p>The advantage of assertions is their ease of use and their “compactness” – they are rarely more than one line of code. They are therefore especially useful in situations where you think that the specific error condition will never be fulfilled and it therefore seems to be wasteful to check it and raise an exception. Imagine for example that the <code>rescale</code> function is only ever called from within one of your algorithms, and it is guaranteed that it will not be called with an array of identical values. In that case, you might not want to bother with the error message we put in previously. Adding an assertion is “cheaper” but will still guard you from problems in the future (e.g. when you decide to reuse your function in a different context):</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
+    data_min = numpy.<span class="dt">min</span>(data)
+    data_max = numpy.<span class="dt">max</span>(data)
+    <span class="kw">assert</span> data_max &gt; data_min
+    normalized_data = (data - data_min) / (data_max - data_min)
+    rescaled_data = lower + upper * normalized_data
+    <span class="kw">return</span> rescaled_data</code></pre>
+<p>The general approach to check your expectations (be it with exceptions or with assertions) is called “defensive coding” and is a good habit to get into. Especially in complex algorithms assertions can also serve as documentation in the code and will greatly help with debugging by making your expections clear:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
+    data_min = numpy.<span class="dt">min</span>(data)
+    data_max = numpy.<span class="dt">max</span>(data)
+    <span class="kw">assert</span> data_max &gt; data_min
+    normalized_data = (data - data_min) / (data_max - data_min)
+    <span class="kw">assert</span> normalized_numpy.<span class="dt">min</span>(data) == <span class="fl">0.0</span>
+    <span class="kw">assert</span> normalized_numpy.<span class="dt">max</span>(data) == <span class="fl">1.0</span>
+    rescaled_data = lower + (upper - lower) * normalized_data
+    <span class="kw">return</span> rescaled_data</code></pre>
+<p>Let’s run our function and make sure that none of the assertions is raised:</p>
+<pre class="sourceCode python"><code class="sourceCode python">ar = numpy.array([<span class="fl">0.3</span>, <span class="fl">0.6</span>, <span class="fl">0.9</span>])
+<span class="dt">print</span>(rescale(ar, lower=<span class="fl">0.5</span>, upper=<span class="fl">1.5</span>))</code></pre>
+<pre class="output"><code>[ 0.5  1.   1.5]</code></pre>
+<p>There is a potential problem with our last two assertions, though: we deal with floating point values and comparing them for equality is rarely a good idea:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="fl">0.3</span> == <span class="dv">3</span>*<span class="fl">0.1</span></code></pre>
+<pre class="output"><code>False</code></pre>
+<p>In fact, just re-writing our function in a mathematically (but not numerically!) equivalent way, will make the assertion fail:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
+    data_min = numpy.<span class="dt">min</span>(data)
+    data_max = numpy.<span class="dt">max</span>(data)
+    <span class="kw">assert</span> data_max &gt; data_min
+    normalized_data = data / (data_max - data_min) - data_min / (data_max - data_min)
+    <span class="kw">assert</span> normalized_numpy.<span class="dt">min</span>(data) == <span class="fl">0.0</span>
+    <span class="kw">assert</span> normalized_numpy.<span class="dt">max</span>(data) == <span class="fl">1.0</span>
+    rescaled_data = lower + (upper - lower) * normalized_data
+    <span class="kw">return</span> rescaled_data</code></pre>
+<p>This should not have changed anything, but in fact the assertion is now failing:</p>
+<pre class="sourceCode python"><code class="sourceCode python">ar = numpy.array([<span class="fl">0.3</span>, <span class="fl">0.6</span>, <span class="fl">0.9</span>])
+<span class="dt">print</span>(rescale(ar, lower=<span class="fl">0.5</span>, upper=<span class="fl">1.5</span>))</code></pre>
+<pre class="output"><code>AssertionError                            Traceback (most recent call last)
+&lt;ipython-input-3-48e53c12007e&gt; in &lt;module&gt;()
+      1 ar = numpy.array([0.3, 0.6, 0.9])
+----&gt; 2 print(rescale(ar, lower=0.5, upper=1.5))
+
+&lt;ipython-input-2-49242bbbe0b1&gt; in rescale(data, lower, upper)
+      5     normalized_data = data / (data_max - data_min) - data_min / (data_max - data_min)
+      6     assert normalized_numpy.min(data) == 0.0
+----&gt; 7     assert normalized_numpy.max(data) == 1.0
+      8     rescaled_data = lower + (upper - lower) * normalized_data
+      9     return rescaled_data
+
+AssertionError:</code></pre>
+<p>Since this an issue that one has to deal with all the time in testing numerical code, <code>numpy</code> provides a few helpful functions in the <code>numpy.testing.utils</code> package that check for equality up to a certain precision:</p>
+<pre class="sourceCode python"><code class="sourceCode python">values = numpy.array([<span class="fl">0.3</span>, <span class="dv">3</span>*<span class="fl">0.1</span>, <span class="fl">0.1+0.1+0.1</span>, <span class="fl">0.6</span>/<span class="dv">2</span>])
+<span class="dt">print</span>(values == <span class="fl">0.1</span>)</code></pre>
+<pre class="output"><code>[ True False False  True]</code></pre>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> numpy.testing.utils <span class="ch">import</span> assert_allclose
+assert_allclose(values, <span class="fl">0.1</span>, rtol=<span class="fl">1e-12</span>)
+<span class="dt">print</span>(<span class="st">&#39;no assertion raised&#39;</span>)</code></pre>
+<pre class="output"><code>no assertion raised</code></pre>
+<p>There are more helpful <code>assert_…</code> functions in that package, we’ll use them later in the lesson.</p>
+<section class="challenge panel panel-success">
+<div class="panel-heading">
+<h2 id="the-final-touch"><span class="glyphicon glyphicon-pencil"></span>The final touch</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>Replace the problematic assertions with <code>assert_allclose</code></li>
+<li>Before returning the result – what assertion(s) could we use to check the result?</li>
+</ul>
+</div>
+</section>
+<p>TODO: some summary</p>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/paris-swc/python-testing-debugging-profiling">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="http://software-carpentry.org/v5/js/jquery-1.9.1.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>
