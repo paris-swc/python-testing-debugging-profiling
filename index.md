@@ -33,3 +33,8 @@ title: Testing, debugging, and profiling
 7.  [Introduction](06-debugging-introduction.html)
 8.  [Post-mortem debugging](07-debugging-post-mortem.html)
 9.  [Step-by-step debugging](08-debugging-stepping.html)
+
+### Part 3: Profiling
+10. [Introduction](09-profiling-introduction.html)
+11. [Total runtime measurements](10-profiling-basic.html)
+12. [Detailed runtime measurements](11-profiling-detailed.html)

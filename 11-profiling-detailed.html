@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: Profiling</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">Profiling</h1></a>
+          <h2 class="subtitle">Detailed runtime measurements</h2>
+          <p>The tools from the previous section can help us decide the question whether we need to optimize in the first place (is the total run time fast enough?) and it can guide when we want to replace code by a better-performing alternative (such as a more specialized numpy function instead of a general built-in function). They do not tell us <em>what</em> to optimize, though.</p>
+<p>As a first example, let’s us have a look at the classical <a href="https://en.wikipedia.org/wiki/Fibonacci_number" title="Fibonacci number (wikipedia)">Fibonaci sequence</a> , where each number is the sum of the two preceding numbers. This can be directly written down in a recursive function (note that for simplicity we leave away all error checking, e.g. for negative numbers):</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> fibonacci(n):
+  <span class="kw">if</span> n &lt; <span class="dv">2</span>:
+    <span class="kw">return</span> n  <span class="co"># fibonacci(0) == 0, fibonacci(1) == 1</span>
+  <span class="kw">else</span>:
+    <span class="kw">return</span> fibonacci(n - <span class="dv">2</span>) + fibonacci(n - <span class="dv">1</span>)</code></pre>
+<p>This seems to work fine, but the runtime increases with <code>n</code> in a dramatic fashion:</p>
+<pre class="sourceCode python"><code class="sourceCode python">%time factorial(<span class="dv">10</span>)</code></pre>
+<pre><code>CPU times: user 0 ns, sys: 0 ns, total: 0 ns
+Wall time: 52.7 µs
+
+89</code></pre>
+<pre class="sourceCode python"><code class="sourceCode python">%time factorial(<span class="dv">20</span>)</code></pre>
+<pre><code>CPU times: user 12 ms, sys: 0 ns, total: 12 ms
+Wall time: 9.63 ms
+
+10946</code></pre>
+<pre class="sourceCode python"><code class="sourceCode python">%time factorial(<span class="dv">30</span>)</code></pre>
+<pre><code>CPU times: user 696 ms, sys: 0 ns, total: 696 ms
+Wall time: 695 ms
+
+1346269</code></pre>
+<pre class="sourceCode python"><code class="sourceCode python">%time factorial(<span class="dv">35</span>)</code></pre>
+<pre><code>CPU times: user 7.49 s, sys: 24 ms, total: 7.52 s
+Wall time: 7.52 s
+
+14930352</code></pre>
+<p>To get an idea what is going on, we can use <code>%prun</code>, which runs a command with Python’s built-in profiler:</p>
+<pre class="sourceCode python"><code class="sourceCode python">% prun factorial(<span class="dv">35</span>)</code></pre>
+<pre class="output"><code>29860706 function calls (4 primitive calls) in 10.621 seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+29860703/1   10.621    0.000   10.621   10.621 &lt;ipython-input-6-b471b8bf6ddb&gt;:1(factorial)
+        1    0.000    0.000   10.621   10.621 {built-in method builtins.exec}
+        1    0.000    0.000   10.621   10.621 &lt;string&gt;:1(&lt;module&gt;)
+        1    0.000    0.000    0.000    0.000 {method &#39;disable&#39; of &#39;_lsprof.Profiler&#39; objects}</code></pre>
+<p>The output gives us three pieces of information for every function called during the execution of the command: the number of times the function was called (<code>ncalls</code>), the total time spend in that function itself (<code>tottime</code>) and the time spend in that function, including all time spend in functions called by that function (<code>cumtime</code>). It is not surprising that all of the time is spend in the <code>factorial</code> function (after all, that’s the only function we have) but the function got called 29860703 times! There is no way we are going to get a decent performance from this function without changing the approach fundamentally.</p>
+<section class="challenge panel panel-success">
+<div class="panel-heading">
+<h2 id="a-better-fibonacci-sequence"><span class="glyphicon glyphicon-pencil"></span>A better Fibonacci sequence</h2>
+</div>
+<div class="panel-body">
+<p>Do you know of a better way to write the Fibonacci function? Can you imagine specific ways of using that function where you would prefer yet another approach?</p>
+</div>
+</section>
+<p>Optimizing a calculation by using a fundamentally different approach is called “algorithmic optimization” and it is the potentially most powerful way to increase the performance of a program. Whenever the runtime of a program appears to be slow, the first check should be whether there is a function that takes a lot of time and is called more often than expected (e.g. we calculate a measure on 1000 values and expect a function to be called about a 1000 times as well but it is called 1000*1000 times instead).</p>
+<p>TODO: Show an example with a nested loop</p>
+<p>TODO: Demonstrate snakeviz</p>
+<p>TODO: Demonstrate line profiler</p>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/paris-swc/python-testing-debugging-profiling">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="http://software-carpentry.org/v5/js/jquery-1.9.1.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>

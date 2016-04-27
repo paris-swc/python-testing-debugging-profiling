@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: Profiling</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">Profiling</h1></a>
+          <h2 class="subtitle">Introduction</h2>
+          <aside class="callout panel panel-info">
+<div class="panel-heading">
+<h2 id="quote-by-donald-knuth"><span class="glyphicon glyphicon-pushpin"></span>Quote by Donald Knuth</h2>
+</div>
+<div class="panel-body">
+<p>“We should forget about small efficiencies, say about 97% of the time: <strong>premature optimization is the root of all evil</strong>. Yet we should not pass up our opportunities in that critical 3%”</p>
+</div>
+</aside>
+<p>Know what to optimize, spend the time where it is worth it:</p>
+<div class="figure">
+<img src="img/Optimizing-different-parts.svg" alt="Optimizing two tasks (By Gorivero, Wikimedia, Public Domain)" />
+<p class="caption">Optimizing two tasks (<a href="https://commons.wikimedia.org/w/index.php?curid=3366573">By Gorivero, Wikimedia, Public Domain</a>)</p>
+</div>
+<p>General approach:</p>
+<ol style="list-style-type: decimal">
+<li>Make sure that things are <em>correct</em> (fast but wrong does not help you)!</li>
+<li>Write tests so that you can be confident that your code is still correct after optimzing it.</li>
+<li>Measure the total run time, decide whether you need to optimize the code in the first place (see graphic below).</li>
+<li>Profile the code to decide where an optimization could be the most useful.</li>
+<li>Optimize it and go back</li>
+</ol>
+<div class="figure">
+<img src="img/is_it_worth_the_time.png" alt="Is it worth the time? XKCD comic, licensed CC BY-NC 2.5" />
+<p class="caption">Is it worth the time? <a href="http://xkcd.com/1205/">XKCD comic</a>, licensed <a href="http://creativecommons.org/licenses/by-nc/2.5/">CC BY-NC 2.5</a></p>
+</div>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/paris-swc/python-testing-debugging-profiling">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="http://software-carpentry.org/v5/js/jquery-1.9.1.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>

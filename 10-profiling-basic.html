@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: Profiling</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">Profiling</h1></a>
+          <h2 class="subtitle">Total runtime measurements</h2>
+          <p>Ipython offers two useful commands to measure the time a single line or cell of code takes to execute:</p>
+<ul>
+<li><code>%time</code> will time the total runtime in a simple way (much like the command <code>time</code> in a UNIX shell) – if your command/script takes a very long time to run, this is what you want to use.</li>
+<li><code>%timeit</code> will repeat the time measurements many times: by default it will do 3 trials, where each trial will execute the command N times. The number N is chosen so that the total test run takes a couple of seconds and the reported time will be the one of the best trial. This gives much more precise measurements for short-running commands.</li>
+</ul>
+<pre class="sourceCode python"><code class="sourceCode python">In [<span class="dv">2</span>]: square_ar = numpy.random.rand(<span class="dv">1000</span>, <span class="dv">1000</span>)
+In [<span class="dv">3</span>]: %time w, v =  numpy.linalg.eig(square_ar)</code></pre>
+<pre class="output"><code>CPU times: user 4.54 s, sys: 240 ms, total: 4.78 s
+Wall time: 2.44 s</code></pre>
+<p>For small computations that are repeated many times, <code>timeit</code> is the better tool:</p>
+<pre class="sourceCode python"><code class="sourceCode python">In [<span class="dv">4</span>]: %timeit square_ar.var()</code></pre>
+<pre class="output"><code>The slowest run took 5.01 times longer than the fastest. This could mean that an intermediate result is being cached.
+100 loops, best of 3: 6.05 ms per loop</code></pre>
+<p>We get a warning message, most likely because the very first run was much slower than the other runs due to cache effects (data that was previously used is in a fast memory and can be reused very efficiently). Nowadays a lot of performance optimization revolves around the efficient use of memory in general and caches in particular. Whether we are interested in the results including these effects or not depends on our question, but if we are only interested in the “pure computation” time then one strategy is to scale up the problem size:</p>
+<pre class="sourceCode python"><code class="sourceCode python">In [<span class="dv">5</span>]: square_ar = numpy.random.rand(<span class="dv">3000</span>, <span class="dv">3000</span>)
+In [<span class="dv">6</span>]: %timeit square_ar.var()</code></pre>
+<pre class="output"><code>10 loops, best of 3: 101 ms per loop</code></pre>
+<p>For the timing of a series of statements, <code>%%timeit</code> can be used in the first line of a jupyter notebook cell to time the full cell.</p>
+<section class="challenge panel panel-success">
+<div class="panel-heading">
+<h2 id="sum-vs.sum"><span class="glyphicon glyphicon-pencil"></span>sum vs. sum</h2>
+</div>
+<div class="panel-body">
+<p>numpy has a <code>sum</code> function, but <code>sum</code> is also a standard built-in function in Python. Both can be used with all kind of Python sequences, e.g. with Python lists or numpy arrays. Use <code>a = numpy.arange(1000000)</code> and <code>l = list(range(1000000))</code> as example data and compare the runtime of <code>sum</code> vs. <code>numpy.sum</code> for the two variables. Which function is faster. Can you guess why?</p>
+</div>
+</section>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/paris-swc/python-testing-debugging-profiling">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="http://software-carpentry.org/v5/js/jquery-1.9.1.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>
