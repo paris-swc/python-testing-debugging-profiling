@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: Debugging</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">Debugging</h1></a>
+          <h2 class="subtitle">Step-by-step debugging</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>Understand how to run a script under debugger control</li>
+<li>Understand how to use the debugger to stop execution at certain points</li>
+<li>Understand how to use the debugger to step through a program</li>
+</ul>
+</div>
+</section>
+<p>The following assumes that we have the files <code>histograms.py</code> and <code>do_equalization.py</code> in our current directory, together with the example image <code>Unequalized_Hawkes_Bay_NZ.png</code>. The file <code>histograms.py</code> defines two functions a function <code>plot_histogram</code> and a function <code>equalize</code>. The function <code>plot_histogram</code> plots the histogram of data values in an array and the cumulative distribution of this histogram on top of it. The equalize function is meant to perform the algorithm of <a href="https://en.wikipedia.org/wiki/Histogram_equalization" title="Histogram equalization (Wikipedia)">histogram equalization</a> on a grayscale image:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> equalize(image, n_bins=<span class="dv">256</span>):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    Perform histogram equalization on the given grayscale ``image`` (2D array</span>
+<span class="co">    of intensity values between 0 and 1), using ``n_bins`` bins for the</span>
+<span class="co">    histogram.</span>
+<span class="co">    Returns the equalized image.</span>
+<span class="co">    &quot;&quot;&quot;</span>
+    bins = numpy.linspace(<span class="dv">0</span>, <span class="dv">1</span>, n_bins, endpoint=<span class="ot">True</span>)
+    bins, hist = numpy.histogram(image.flatten(), bins=bins, density=<span class="ot">True</span>)
+    cdf = hist.cumsum() / n_bins
+    <span class="co"># Invert the CDF by using numpy&#39;s interp function</span>
+    equalized = numpy.interp(image.flatten(), bins, cdf)
+
+    <span class="co"># All this was performed on flattened versions of the image, reshape the</span>
+    <span class="co"># equalized image back to the original shape</span>
+    <span class="kw">return</span> equalized.reshape(image.shape)</code></pre>
+<p>The main idea behind the algorithm is that we want to transform the image using a mapping that preserves the relative values of the intensities but use all the values in the intensity range for an (approximately) equal amount of pixels. It turns out that inverting the cumulative distribution function of the intensity values gives us such a mapping.</p>
+<p>With that in mind, the algorithm has the following steps:</p>
+<ol style="list-style-type: decimal">
+<li>Calculate the histogram of the grayscale values (between 0 and 1)</li>
+<li>Calculate the cumulative distribution of these values</li>
+<li>Interpret the cumulative distribution as a function and invert it, then use that inverted function to get the new intensity values.</li>
+</ol>
+<p>As a result, the equalized image should have a flat histogram of intensity values and equivalently a linear cumulative distribution of intensity values from 0 to 1.</p>
+<p>Let’s try to run the <code>do_equalization.py</code> script which plots an example image and its histogram, equalizes it using the above function and plots the result:</p>
+<pre class="sourceCode python"><code class="sourceCode python">% run do_equalization.py</code></pre>
+<pre class="output"><code>---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+[..]/do_equalization.py in &lt;module&gt;()
+     16
+     17     # Equalize the image histogram
+---&gt; 18     equalized = histograms.equalize(image)
+     19     plt.subplot(2, 2, 3)
+     20     plt.imshow(equalized, cmap=&#39;gray&#39;)
+
+[..]/histograms.py in equalize(image, n_bins)
+     16     cdf = hist.cumsum() / n_bins
+     17     # Invert the CDF by using numpy&#39;s interp function
+---&gt; 18     equalized = numpy.interp(image.flatten(), bins, cdf)
+     19
+     20     # All this was performed on flattened versions of the image, reshape the
+
+[..]/function_base.py in interp(x, xp, fp, left, right, period)
+   1269             return compiled_interp([x], xp, fp, left, right).item()
+   1270         else:
+-&gt; 1271             return compiled_interp(x, xp, fp, left, right)
+   1272     else:
+   1273         if period == 0:
+
+ValueError: fp and xp are not of the same length.</code></pre>
+<p>OK, apparently that did not work. The arguments to <code>numpy.interp</code> do not seem to have the same length. Let’s use the debugger to investigate this:</p>
+<pre class="sourceCode python"><code class="sourceCode python">% debug</code></pre>
+<pre class="output"><code>
+ipdb&gt; xp.shape
+(99,)
+ipdb&gt; fp.shape
+(100,)
+ipdb&gt; u
+&gt; [...]/histograms.py(18)equalize()
+     16     cdf = hist.cumsum() / n_bins
+     17     # Invert the CDF by using numpy&#39;s interp function
+---&gt; 18     equalized = numpy.interp(image.flatten(), bins, cdf)
+     19
+     20     # All this was performed on flattened versions of the image, reshape the
+
+ipdb&gt; bins.shape
+(99,)
+ipdb&gt; cdf.shape
+(100,)
+ipdb&gt; q</code></pre>
+<p>So it seems that <code>bins</code> and <code>cdf</code> that we provide to <code>numpy.interp</code> differ in their length by one. This is a typical thing to happen when dealing with histograms, since we sometimes use bins (N values) and sometimes bin edges (N+1 values). Let’s fix this, by removing the last value of the <code>cdf</code> variable:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> equalize(image, n_bins=<span class="dv">256</span>):
+    bins = numpy.linspace(<span class="dv">0</span>, <span class="dv">1</span>, n_bins, endpoint=<span class="ot">True</span>)
+    bins, hist = numpy.histogram(image.flatten(), bins=bins, density=<span class="ot">True</span>)
+    cdf = hist.cumsum() / n_bins
+    <span class="co"># Invert the CDF by using numpy&#39;s interp function</span>
+    equalized = numpy.interp(image.flatten(), bins, cdf[:-<span class="dv">1</span>])
+
+    <span class="co"># All this was performed on flattened versions of the image, reshape the</span>
+    <span class="co"># equalized image back to the original shape</span>
+    <span class="kw">return</span> equalized.reshape(image.shape)</code></pre>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h2><span class="glyphicon glyphicon-pushpin"></span>Jupyter notebooks and external files</h2>
+</div>
+<div class="panel-body">
+<p>The jupyter notebook is best suited to a programming style where all the code that is changed is included in the notebook: after a change to a function, the re-execution of the respective cell will update its definition. For more complex projects with functions defined in external files, there is a problem, though: Python only imports a module once, therefore if we edit the external file (e.g. in a text editor), then those changes are not taken into account, we will still use the version of the module when we (or another script/function) first imported it. This behavior can be very confusing… There are various ways to deal with this problem, but probably the easiest is to force the reload of all modules for every code execution:</p>
+<pre class="sourceCode python"><code class="sourceCode python">%load_ext autoreload
+%autoreload <span class="dv">2</span></code></pre>
+<p>Reloading modules remains a tricky issue, though. If it fails, the easiest might be to restart the kernel of the current notebook and to re-execute all cells.</p>
+</div>
+</aside>
+<p>Let’s run the script again:</p>
+<pre class="sourceCode python"><code class="sourceCode python">% run do_equalization.py</code></pre>
+<div class="figure">
+<img src="img/08-debugging-output_1.png" alt="do_equalization output 1" /><p class="caption">do_equalization output 1</p>
+</div>
+<p>Um, well, the script now runs without an error message but the result does not look any good. We don’t have an error that we can debug in a post-mortem way so instead we start the complete script under debugger control:</p>
+<pre class="sourceCode python"><code class="sourceCode python">% run -d do_equalization.py</code></pre>
+<pre class="output"><code>Breakpoint 1 at [...]/examples/do_equalization.py:1
+NOTE: Enter &#39;c&#39; at the ipdb&gt;  prompt to continue execution.
+&gt; [...]/do_equalization.py(1)&lt;module&gt;()
+1---&gt; 1 import matplotlib.pyplot as plt
+      2
+      3 import histograms
+      4
+      5 if __name__ == &#39;__main__&#39;:
+
+ipdb&gt;</code></pre>
+<p>As when using <code>%debug</code>, we now have a debugger prompt but now we are at the start of the script. The most important commands are the following:</p>
+<ul>
+<li><code>n</code> (<code>next</code>): Execute the current line and step over it (i.e. stay on the same level)</li>
+<li><code>s</code> (<code>step</code>): Execute the current line by stepping <em>into</em> functions called on the line</li>
+<li><code>c</code> (<code>continue</code>): continue execution until the end of a script, an uncaught exception or a breakpoint (see below)</li>
+<li><code>b</code> (<code>breakpoint</code>): create a new breakpoint at a given line number (and optionally in a given file)</li>
+</ul>
+<p>Just pressing return at the prompt will execute the previous command again (useful for <code>n</code>, <code>s</code>, <code>c</code>).</p>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h2><span class="glyphicon glyphicon-pushpin"></span>Debugging without IPython/Jupyter notebook</h2>
+</div>
+<div class="panel-body">
+<p>In some situations you cannot use IPython, for instance to debug a script that wants to be called from the command line. In this case, you can call the script with <code>python -m pdb script.py</code> or <code>python -m ipdb scrip.py</code> (needs an installation of <code>ipdb</code>):</p>
+<pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">python</span> -m pdb do_equalization.py</code></pre>
+<pre class="output"><code>&gt; [...]/do_equalization.py(1)&lt;module&gt;()
+-&gt; import matplotlib.pyplot as plt
+(Pdb)</code></pre>
+</div>
+</aside>
+<p>We are interested in the code happening in the <code>equalize</code> function, so we’ll set a breakpoint at its first line and continue our execution until then:</p>
+<pre class="output"><code>ipdb&gt; b histograms.py:20
+Breakpoint 2 at [...]/histograms.py:20
+ipdb&gt; c
+&gt; [...]/histograms.py(20)equalize()
+     18     Returns the equalized image.
+     19     &quot;&quot;&quot;
+2--&gt; 20     bins = numpy.linspace(0, 1, n_bins, endpoint=True)
+     21     bins, hist = numpy.histogram(image.flatten(), bins=bins, density=True)
+     22     cdf = hist.cumsum() / n_bins
+
+ipdb&gt; n
+&gt; [...]/histograms.py(21)equalize()
+     19     &quot;&quot;&quot;
+2    20     bins = numpy.linspace(0, 1, n_bins, endpoint=True)
+---&gt; 21     bins, hist = numpy.histogram(image.flatten(), bins=bins, density=True)
+     22     cdf = hist.cumsum() / n_bins
+     23     # Invert the CDF by using numpy&#39;s interp function
+
+ipdb&gt; bins[:10]
+array([ 0.        ,  0.01010101,  0.02020202,  0.03030303,  0.04040404,
+        0.05050505,  0.06060606,  0.07070707,  0.08080808,  0.09090909])
+ipdb&gt; n
+&gt; [...]/histograms.py(22)equalize()
+2    20     bins = numpy.linspace(0, 1, n_bins)
+     21     bins, hist = numpy.histogram(image.flatten(), bins=bins, density=True)
+---&gt; 22     cdf = hist.cumsum() / n_bins
+     23     # Invert the CDF by using numpy&#39;s interp function
+     24     equalized = numpy.interp(image.flatten(), bins, cdf[:-1])
+
+ipdb&gt; hist[:10]
+array([ 0.        ,  0.01010101,  0.02020202,  0.03030303,  0.04040404,
+        0.05050505,  0.06060606,  0.07070707,  0.08080808,  0.09090909])
+ipdb&gt; bins[:10]
+array([ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.])</code></pre>
+<p>We have found the issue: we swapped the arguments for the return value of <code>numpy.histogram</code>, storing the bin edges in the <code>hist</code> variable and the histogram in <code>bin</code>. Looking back at our previous fix for the inconsistent length of <code>bin</code> and <code>cdf</code> we could have realized back then that <code>bins</code> should have 1 element more than <code>cdf</code> and not the other way round… Fixing those issues leads to the following code:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> equalize(image, n_bins=<span class="dv">256</span>):
+    bins = numpy.linspace(<span class="dv">0</span>, <span class="dv">1</span>, n_bins, endpoint=<span class="ot">True</span>)
+    hist, bins = numpy.histogram(image.flatten(), bins=bins, density=<span class="ot">True</span>)
+    cdf = hist.cumsum() / n_bins
+    <span class="co"># Invert the CDF by using numpy&#39;s interp function</span>
+    equalized = numpy.interp(image.flatten(), bins[:-<span class="dv">1</span>], cdf)
+
+    <span class="co"># All this was performed on flattened versions of the image, reshape the</span>
+    <span class="co"># equalized image back to the original shape</span>
+    <span class="kw">return</span> equalized.reshape(image.shape)</code></pre>
+<p>Now our script runs and gives the expected result:</p>
+<pre class="sourceCode python"><code class="sourceCode python">% run do_equalization.py</code></pre>
+<div class="figure">
+<img src="img/08-debugging-output_2.png" alt="do_equalization output 2" /><p class="caption">do_equalization output 2</p>
+</div>
+<section class="challenge panel panel-success">
+<div class="panel-heading">
+<h2><span class="glyphicon glyphicon-pencil"></span>Debug step by step</h2>
+</div>
+<div class="panel-body">
+<p>TODO</p>
+</div>
+</section>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/paris-swc/python-testing-debugging-profiling">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="http://software-carpentry.org/v5/js/jquery-1.9.1.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>

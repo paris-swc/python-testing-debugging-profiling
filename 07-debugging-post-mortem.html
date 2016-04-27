@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: Debugging</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">Debugging</h1></a>
+          <h2 class="subtitle">Post-mortem debugging</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>Understand what is meant by “post-mortem debugging”</li>
+<li>Understand how to call Python’s debugger after an exception was raised</li>
+</ul>
+</div>
+</section>
+<p>One of the main reasons to start debugging is that the program exited with an error message. Ideally, all the necessary information to find the cause of the problem is in the error message but often this is not the case. In that situation, it might be of interest to have access to the program state at the point <em>where the exception was raised</em>. A common technique to investigate this kind of problem is to edit the code, put <code>print</code> statements at the point where the error was raised and then run the code again. This approach however has several drawbacks:</p>
+<ul>
+<li>The code in question might be some library code that you cannot easily edit (e.g. you need administrator privileges to edit code in a system-wide installation of a library).</li>
+<li>You have to know in advance which variables are of interest to you which means that potentially you’ll have to repeat the process several times.</li>
+<li>You’ll have to clean up afterwards and make sure not to forget any <code>print</code> statements in the code.</li>
+<li>Depending on the program you are debugging, running everything again might take a long time.</li>
+</ul>
+<p>There is an alternative approach using Python’s built-in symbolic debugger. When an exception is raised, its full context is stored and can be investigated. This kind of debugging is called “post-mortem” (i.e. “after death”), because you only use the debugger after the program has crashed as opposed to running it under the control of the debugger from the start (as we’ll do later). Let’s have a look at some erroneous code:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="ch">import</span> numpy
+<span class="kw">def</span> find_first(data, element):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    Return the index of the first appearance of ``element`` in</span>
+<span class="co">    ``data`` (or -1 if ``data`` does not contain ``element``).</span>
+<span class="co">    &quot;&quot;&quot;</span>
+    counter = <span class="dv">0</span>
+    <span class="kw">while</span> counter &lt;= <span class="dt">len</span>(data):
+        <span class="kw">if</span> data[counter] == element:
+            <span class="kw">return</span> counter
+        counter += <span class="dv">1</span>
+    <span class="kw">return</span> -<span class="dv">1</span>
+
+<span class="kw">def</span> check_data(target):
+    test_data = [<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">5</span>]
+    <span class="co"># We look for a zero in the data</span>
+    index = find_first(test_data, target)
+    <span class="kw">if</span> index != -<span class="dv">1</span>:
+        <span class="dt">print</span>(<span class="st">&#39;Data until first occurrence of&#39;</span>, target, <span class="st">&#39;:&#39;</span>, test_data[:index])
+    <span class="kw">else</span>:
+        <span class="dt">print</span>(<span class="st">&#39;No occurrence of&#39;</span>, target, <span class="st">&#39;in the data&#39;</span>)</code></pre>
+<p>The <code>find_first</code> function finds the first occurrence of an element in a list (or an array) of elements and returns its index. The <code>check_data</code> function uses this function to find a certain value in the data and prints the data until that point. It uses some fake “data” and takes an <code>target</code> argument to specify what value to look for.</p>
+<p>If we run the <code>check_data</code> function, all looks fine:</p>
+<pre class="sourceCode python"><code class="sourceCode python">check_data(<span class="dv">5</span>)</code></pre>
+<pre class="output"><code>Data until first occurrence of 5 : [3, 2, 8, 9, 3, 4, 7]</code></pre>
+<p>Now let’s run the function again but use a different target value:</p>
+<pre class="sourceCode python"><code class="sourceCode python">check_data(<span class="dv">1</span>)</code></pre>
+<pre class="output"><code>---------------------------------------------------------------------------
+IndexError                                Traceback (most recent call last)
+&lt;ipython-input-58-cb57f256f664&gt; in &lt;module&gt;()
+----&gt; 1 check_data(1)
+
+&lt;ipython-input-56-610c1db03285&gt; in check_data(target)
+     16     test_data = [3, 2, 8, 9, 3, 4, 7, 5]
+     17     # We look for a zero in the data
+---&gt; 18     index = find_first(test_data, target)
+     19     if index != -1:
+     20         print(&#39;Data until first occurrence of&#39;, target, &#39;:&#39;, test_data[:index])
+
+&lt;ipython-input-56-610c1db03285&gt; in find_first(data, element)
+      8     counter = 0
+      9     while counter &lt;= len(data):
+---&gt; 10         if data[counter] == element:
+     11             return counter
+     12         counter += 1
+
+IndexError: list index out of range</code></pre>
+<p>There seems to be a problem and unfortunately the <code>IndexError</code> is not very precise (note that the error message would have been more helpful if we had used a numpy array instead of a list for the “data”). Let’s investigate what caused it by using the symbolic debugger (note that the following command only works in ipython or the jupyter notebook):</p>
+<pre class="sourceCode python"><code class="sourceCode python">% debug</code></pre>
+<pre class="output"><code>&lt;ipython-input-56-610c1db03285&gt;(10)find_first()
+      8     counter = 0
+      9     while counter &lt;= len(data):
+---&gt; 10         if data[counter] == element:
+     11             return counter
+     12         counter += 1
+
+ipdb&gt; </code></pre>
+<p>We are now in an <code>ipdb</code> console (an improved interface to Python’s built-in <code>pdb</code> debugger) and can issue <code>ipdb</code> commands and investigate the state of variables and expressions in the context pointed to by the arrow. To distinguish the two, we can add a <code>!</code> to the start of the line when we are interested in variables/expressions:</p>
+<pre class="output"><code>ipdb&gt; !counter
+8
+ipdb&gt; !len(data)
+8</code></pre>
+<p>This is not necessary when there is no possible confusion between <code>ipdb</code> commands and Python expression, though:</p>
+<pre class="output"><code>ipdb&gt; counter
+8</code></pre>
+<p>Sometimes, the values we are interested in are not accessible at the exact point where the exception was raised. For example, we cannot access <code>test_data</code> and <code>target</code> used in <code>check_data</code> (in the current example, this is of course not an actual problem, since they are handed over to <code>find_first</code> as <code>data</code> and <code>element</code>):</p>
+<pre class="output"><code>ipdb&gt; test_data
+*** NameError: name &#39;test_data&#39; is not defined</code></pre>
+<p>To access the data, we can move “up” in the exception stack and investigate the variables there:</p>
+<pre class="output"><code>ipdb&gt; up
+&gt; &lt;ipython-input-56-610c1db03285&gt;(18)check_data()
+     16     test_data = [3, 2, 8, 9, 3, 4, 7, 5]
+     17     # We look for a zero in the data
+---&gt; 18     index = find_first(test_data, target)
+     19     if index != -1:
+     20         print(&#39;Data until first occurrence of&#39;, target, &#39;:&#39;, test_data[:index])
+ipdb&gt; test_data
+     [3, 2, 8, 9, 3, 4, 7, 5]</code></pre>
+<p>To get back to where we were before, we use <code>down</code> or alternatively <code>d</code> (instead of <code>up</code> we can also use <code>u</code>):</p>
+<pre class="output"><code>ipdb&gt; d
+&gt; &lt;ipython-input-56-610c1db03285&gt;(10)find_first()
+      8     counter = 0
+      9     while counter &lt;= len(data):
+---&gt; 10         if data[counter] == element:
+     11             return counter
+     12         counter += 1</code></pre>
+<p>We finished our debugging because we figured out that the problem lies in the <code>counter</code> variable going one step too far – instead of <code>counter &lt;= len(data)</code> the comparison should read <code>counter &lt; len(data)</code>. We can therefore quit the debugger with <code>q</code> (short for <code>quit</code>):</p>
+<pre class="output"><code>ipdb&gt; q</code></pre>
+<p>Now, if this were a real-life situation we would now take the time to add a test to our test suite, checking for this condition (searching for an element that is not present in the list). We’d make sure that this test fails and then go on to fix the test. This way, we’d be sure not to re-introduce the same error in future versions of our code (e.g. because of a code re-organization) without noticing. Incidentally, there <em>is</em> a way to re-organize the code and make it less error-prone:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> find_first(data, element):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    Return the index of the first appearance of ``element`` in</span>
+<span class="co">    ``data`` (or -1 if ``data`` does not contain ``element``).</span>
+<span class="co">    &quot;&quot;&quot;</span>
+    <span class="kw">for</span> index, data_element in <span class="dt">enumerate</span>(data):
+        <span class="kw">if</span> data_element == element:
+            <span class="kw">return</span> index
+
+    <span class="kw">return</span> -<span class="dv">1</span></code></pre>
+<p>Using a counter and indexing into a list at every iteration of a loop is a often considered to be a so-called “<a href="https://en.wikipedia.org/wiki/Anti-pattern">anti-pattern</a>” in Python.</p>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h2><span class="glyphicon glyphicon-pushpin"></span>Post-mortem debugging with pytest</h2>
+</div>
+<div class="panel-body">
+<p>You can run your test suite with pytest and make pytest open a debugger session for you as soon as an error occurs:</p>
+<pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">py.test</span> --pdb</code></pre>
+<pre class="output"><code>============================= test session starts ==============================
+platform linux -- Python 3.5.1, pytest-2.8.5, py-1.4.31, pluggy-0.3.1
+rootdir: [...], inifile:
+collected 2 items
+
+test_whiten.py .F
+&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; traceback &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+
+   def test_2d():
+        test_data = numpy.array([[1, 3, 5, 7],
+                                 [2, 3, 4, 1]])
+        whitened = whiten(test_data)
+&gt;       assert_allclose(whitened.mean(), 0)
+E       AssertionError:
+E       Not equal to tolerance rtol=1e-07, atol=0
+E       
+E       (mismatch 100.0%)
+E        x: array(-2.7755575615628914e-17)
+E        y: array(0)
+
+test_whiten.py:17: AssertionError
+&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; entering PDB &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt; [...]/test_whiten.py(17)test_2d()
+-&gt; assert_allclose(whitened.mean(), 0)
+(Pdb)</code></pre>
+</div>
+</aside>
+<p>TODO: Exercise</p>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/paris-swc/python-testing-debugging-profiling">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="http://software-carpentry.org/v5/js/jquery-1.9.1.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>

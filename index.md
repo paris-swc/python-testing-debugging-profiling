@@ -28,3 +28,8 @@ title: Testing, debugging, and profiling
 4.  [Unit tests](03-testing-units.html)
 5.  [Running tests with pytest](04-testing-pytest.html)
 6.  [Summary](05-testing-summary.html)
+
+### Part 2: Debugging
+7.  [Introduction](06-debugging-introduction.html)
+8.  [Post-mortem debugging](07-debugging-post-mortem.html)
+9.  [Step-by-step debugging](08-debugging-stepping.html)
