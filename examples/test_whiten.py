@@ -1,4 +1,4 @@
-from numpy.testing.utils import assert_allclose, assert_equal
+from numpy.testing.utils import assert_allclose
 import numpy
 
 from preprocess import whiten
