@@ -104,8 +104,123 @@ lot of time and is called more often than expected (e.g. we calculate a measure
 on 1000 values and expect a function to be called about a 1000 times as well
 but it is called 1000*1000 times instead).
 
-TODO: Show an example with a nested loop
 
-TODO: Demonstrate snakeviz
 
-TODO: Demonstrate line profiler
+The output of a profiler run can easily become overwhelming in bigger projects.
+It can therefore be useful to use a graphical tool that represents this
+information in a more accessible and interactive way. One such tool is
+`snakeviz` that can also be used directly from ipython or a jupyter notebook.
+
+Let's have a another look at the `equalize` function we used earlier:
+
+~~~ {.python}
+def equalize(image, n_bins=256):
+    bins = numpy.linspace(0, 1, n_bins, endpoint=True)
+    hist, bins = numpy.histogram(image.flatten(), bins=bins, density=True)
+    cdf = hist.cumsum() / n_bins
+    # Invert the CDF by using numpy's interp function
+    equalized = numpy.interp(flat_image, bins[:-1], cdf)
+
+    # All this was performed on flattened versions of the image, reshape the
+    # equalized image back to the original shape
+    return equalized.reshape(image.shape)
+~~~
+
+We'll again load our example image:
+
+~~~ {.python}
+image = plt.imread('Unequalized_Hawkes_Bay_NZ.png')[:, :, 0]
+~~~
+
+With `snakeviz` installed, we can load the `snakeviz` magic:
+
+~~~ {.python}
+% load_ext snakeviz
+~~~
+
+We can then use `%snakeviz` in the same way we previously used `%prun` and it
+will show us a graphical representation of where the time was spent:
+
+~~~ {.python}
+% snakeviz
+~~~
+
+> ## snakeviz without ipython/jupyter notbook {.callout}
+> We can save the profiling information of a Python script to disk:
+>
+> ~~~ {.bash}
+> $ python -m cProfile -o filename myscript.py
+> ~~~
+>
+> We can then launch snakeviz on the stored information:
+>
+> ~~~ {.bash}
+> $ snakeviz filename
+> ~~~
+
+This representation is useful for a global overview of the runtime of the
+various functions in a project. It might uncover functions that do not seem to
+be worth optimizing because of their short runtime but are in fact called from
+various places so that their total runtime is significant.
+
+`%prun` and `%snakeviz` give information about which functions take up the most
+time, but they are less useful to see optimization potential in single
+functions. Another type of profiling is line-based profiling which measures the
+runtime of every line in one or more functions. This functionality is provided
+by the `line_profiler` package which also provides a magic extension for
+ipython:
+
+~~~ {.python}
+% load_ext line_profiler
+~~~
+
+The magic command is `%lprun` and can be used in a similar way to `%prun` and
+`%snakeviz`, but in contrast to those other profiling functions it needs the
+specification of the functions of interest in addition:
+
+~~~ {.python}
+%lprun -f equalize equalize(image)
+~~~
+~~~ {.output}
+Timer unit: 1e-06 s
+
+Total time: 0.013282 s
+File: <ipython-input-96-437a650e3f63>
+Function: equalize at line 1
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+     1                                           def equalize(image, n_bins=256):
+     2         1           79     79.0      0.6      bins = numpy.linspace(0, 1, n_bins, endpoint=True)
+     3         1         8160   8160.0     61.4      hist, bins = numpy.histogram(image.flatten(), bins=bins, density=True)
+     4         1           18     18.0      0.1      cdf = hist.cumsum() / n_bins
+     5                                               # Invert the CDF by using numpy's interp function
+     6         1         5006   5006.0     37.7      equalized = numpy.interp(image.flatten(), bins[:-1], cdf)
+     7                                           
+     8                                               # All this was performed on flattened versions of the image, reshape the
+     9                                               # equalized image back to the original shape
+    10         1           19     19.0      0.1      return equalized.reshape(image.shape)
+~~~
+
+Note that you can specify several `-f function_name` arguments to get the
+information for more than one function with a single `%lprun` call. For each
+line, the output specifies how often the line was executed ("Hits"), how long
+the execution of that line took in total ("Time") and for each time it was
+executed ("Per Hit"), and finally how much of the total time of the function was
+spent in the respective line.
+
+> ## line profiling without ipython/jupyter notbook {.callout}
+> To profile a function with the line profiler, you'll have to annotate it with
+> the `@profile` decorator. You then use `kernprof` instead of `python` to
+> run the script (using `python` will raise an error because it does not know
+> about `@profile`!):
+>
+> ~~~ {.bash}
+> kernprof.py -l myscript.py
+> ~~~
+> The profile will be saved in a file `myscript.py.lprof` and can then be
+> printed with:
+>
+> ~~~ {.bash}
+> $ python -m line_profiler myscript.py.lprof
+> ~~~

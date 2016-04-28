@@ -7,4 +7,6 @@ minutes: 5
 > ## Learning Objectives {.objectives}
 >
 >
-TODO
+
+These notes are still in a draft stage and several bits and pieces (in
+particular introductions and summaries) are still missing.
