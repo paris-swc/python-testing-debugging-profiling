@@ -50,7 +50,7 @@ def find_first(data, element):
     return -1
 
 def check_data(target):
-    test_data = [3, 2, 8, 9, 3, 4, 7, 5]
+    test_data = [3, 2, 8, 9, 3, numpy.nan, 4, 7, 5]
     # We look for a zero in the data
     index = find_first(test_data, target)
     if index != -1:
@@ -71,7 +71,7 @@ If we run the `check_data` function, all looks fine:
 check_data(5)
 ~~~
 ~~~ {.output}
-Data until first occurrence of 5 : [3, 2, 8, 9, 3, 4, 7]
+Data until first occurrence of 5 : [3, 2, 8, 9, 3, nan, 4, 7]
 ~~~
 
 Now let's run the function again but use a different target value:
@@ -86,7 +86,7 @@ IndexError                                Traceback (most recent call last)
 ----> 1 check_data(1)
 
 <ipython-input-56-610c1db03285> in check_data(target)
-     16     test_data = [3, 2, 8, 9, 3, 4, 7, 5]
+     16     test_data = [3, 2, 8, 9, 3, numpy.nan, 4, 7, 5]
      17     # We look for a zero in the data
 ---> 18     index = find_first(test_data, target)
      19     if index != -1:
@@ -159,13 +159,13 @@ variables there:
 ~~~ {.output}
 ipdb> up
 > <ipython-input-56-610c1db03285>(18)check_data()
-     16     test_data = [3, 2, 8, 9, 3, 4, 7, 5]
+     16     test_data = [3, 2, 8, 9, 3, numpy.nan, 4, 7, 5]
      17     # We look for a zero in the data
 ---> 18     index = find_first(test_data, target)
      19     if index != -1:
      20         print('Data until first occurrence of', target, ':', test_data[:index])
 ipdb> test_data
-     [3, 2, 8, 9, 3, 4, 7, 5]
+     [3, 2, 8, 9, 3, nan, 4, 7, 5]
 ~~~
 
 To get back to where we were before, we use `down` or alternatively `d`
@@ -250,4 +250,28 @@ often considered to be a so-called
 > (Pdb)
 > ~~~
 
-TODO: Exercise
+> ## Error debugging {.challenge}
+> Copy & paste the following code and run `test_code_array`. It will fail with
+> an error, use the debugger to find out why.
+>
+> ~~~ {.python}
+> import numpy
+> from numpy.testing.utils import assert_equal
+>
+> def code_array(codes):
+>     '''Store airport codes in an array in numerical form'''
+>     to_numerical_code = numpy.vectorize(lambda code: numpy.array([ord(c) for c in code]))
+>     return numpy.vstack([to_numerical_code(c) for c in codes])
+>
+> def test_code_array():
+>     airport_codes = ['TXL', 'LAX', 'PHX', 'CDG' 'ORY', 'JFK', 'JNB', 'WAW']
+>     expected = numpy.array([[84, 88, 76],
+>                             [76, 65, 88],
+>                             [80, 72, 88],
+>                             [67, 68, 71],
+>                             [79, 82, 89],
+>                             [74, 70, 75],
+>                             [74, 78, 66],
+>                             [87, 65, 87]])
+>     assert_equal(code_array(airport_codes), expected)
+> ~~~

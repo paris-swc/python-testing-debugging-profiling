@@ -30,7 +30,7 @@
           <h2 class="subtitle">Post-mortem debugging</h2>
           <section class="objectives panel panel-warning">
 <div class="panel-heading">
-<h2><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
+<h2 id="learning-objectives"><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
 </div>
 <div class="panel-body">
 <ul>
@@ -61,7 +61,7 @@
     <span class="kw">return</span> -<span class="dv">1</span>
 
 <span class="kw">def</span> check_data(target):
-    test_data = [<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">5</span>]
+    test_data = [<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">3</span>, numpy.nan, <span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">5</span>]
     <span class="co"># We look for a zero in the data</span>
     index = find_first(test_data, target)
     <span class="kw">if</span> index != -<span class="dv">1</span>:
@@ -71,7 +71,7 @@
 <p>The <code>find_first</code> function finds the first occurrence of an element in a list (or an array) of elements and returns its index. The <code>check_data</code> function uses this function to find a certain value in the data and prints the data until that point. It uses some fake “data” and takes an <code>target</code> argument to specify what value to look for.</p>
 <p>If we run the <code>check_data</code> function, all looks fine:</p>
 <pre class="sourceCode python"><code class="sourceCode python">check_data(<span class="dv">5</span>)</code></pre>
-<pre class="output"><code>Data until first occurrence of 5 : [3, 2, 8, 9, 3, 4, 7]</code></pre>
+<pre class="output"><code>Data until first occurrence of 5 : [3, 2, 8, 9, 3, nan, 4, 7]</code></pre>
 <p>Now let’s run the function again but use a different target value:</p>
 <pre class="sourceCode python"><code class="sourceCode python">check_data(<span class="dv">1</span>)</code></pre>
 <pre class="output"><code>---------------------------------------------------------------------------
@@ -80,7 +80,7 @@ IndexError                                Traceback (most recent call last)
 ----&gt; 1 check_data(1)
 
 &lt;ipython-input-56-610c1db03285&gt; in check_data(target)
-     16     test_data = [3, 2, 8, 9, 3, 4, 7, 5]
+     16     test_data = [3, 2, 8, 9, 3, numpy.nan, 4, 7, 5]
      17     # We look for a zero in the data
 ---&gt; 18     index = find_first(test_data, target)
      19     if index != -1:
@@ -118,13 +118,13 @@ IndexError: list index out of range</code></pre>
 <p>To access the data, we can move “up” in the exception stack and investigate the variables there:</p>
 <pre class="output"><code>ipdb&gt; up
 &gt; &lt;ipython-input-56-610c1db03285&gt;(18)check_data()
-     16     test_data = [3, 2, 8, 9, 3, 4, 7, 5]
+     16     test_data = [3, 2, 8, 9, 3, numpy.nan, 4, 7, 5]
      17     # We look for a zero in the data
 ---&gt; 18     index = find_first(test_data, target)
      19     if index != -1:
      20         print(&#39;Data until first occurrence of&#39;, target, &#39;:&#39;, test_data[:index])
 ipdb&gt; test_data
-     [3, 2, 8, 9, 3, 4, 7, 5]</code></pre>
+     [3, 2, 8, 9, 3, nan, 4, 7, 5]</code></pre>
 <p>To get back to where we were before, we use <code>down</code> or alternatively <code>d</code> (instead of <code>up</code> we can also use <code>u</code>):</p>
 <pre class="output"><code>ipdb&gt; d
 &gt; &lt;ipython-input-56-610c1db03285&gt;(10)find_first()
@@ -149,7 +149,7 @@ IndexError: list index out of range</code></pre>
 <p>Using a counter and indexing into a list at every iteration of a loop is a often considered to be a so-called “<a href="https://en.wikipedia.org/wiki/Anti-pattern">anti-pattern</a>” in Python.</p>
 <aside class="callout panel panel-info">
 <div class="panel-heading">
-<h2><span class="glyphicon glyphicon-pushpin"></span>Post-mortem debugging with pytest</h2>
+<h2 id="post-mortem-debugging-with-pytest"><span class="glyphicon glyphicon-pushpin"></span>Post-mortem debugging with pytest</h2>
 </div>
 <div class="panel-body">
 <p>You can run your test suite with pytest and make pytest open a debugger session for you as soon as an error occurs:</p>
@@ -181,7 +181,33 @@ test_whiten.py:17: AssertionError
 (Pdb)</code></pre>
 </div>
 </aside>
-<p>TODO: Exercise</p>
+<section class="challenge panel panel-success">
+<div class="panel-heading">
+<h2 id="error-debugging"><span class="glyphicon glyphicon-pencil"></span>Error debugging</h2>
+</div>
+<div class="panel-body">
+<p>Copy &amp; paste the following code and run <code>test_code_array</code>. It will fail with an error, use the debugger to find out why.</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="ch">import</span> numpy
+<span class="ch">from</span> numpy.testing.utils <span class="ch">import</span> assert_equal
+
+<span class="kw">def</span> code_array(codes):
+    <span class="co">&#39;&#39;&#39;Store airport codes in an array in numerical form&#39;&#39;&#39;</span>
+    to_numerical_code = numpy.vectorize(<span class="kw">lambda</span> code: numpy.array([<span class="dt">ord</span>(c) <span class="kw">for</span> c in code]))
+    <span class="kw">return</span> numpy.vstack([to_numerical_code(c) <span class="kw">for</span> c in codes])
+
+<span class="kw">def</span> test_code_array():
+    airport_codes = [<span class="st">&#39;TXL&#39;</span>, <span class="st">&#39;LAX&#39;</span>, <span class="st">&#39;PHX&#39;</span>, <span class="st">&#39;CDG&#39;</span> <span class="st">&#39;ORY&#39;</span>, <span class="st">&#39;JFK&#39;</span>, <span class="st">&#39;JNB&#39;</span>, <span class="st">&#39;WAW&#39;</span>]
+    expected = numpy.array([[<span class="dv">84</span>, <span class="dv">88</span>, <span class="dv">76</span>],
+                            [<span class="dv">76</span>, <span class="dv">65</span>, <span class="dv">88</span>],
+                            [<span class="dv">80</span>, <span class="dv">72</span>, <span class="dv">88</span>],
+                            [<span class="dv">67</span>, <span class="dv">68</span>, <span class="dv">71</span>],
+                            [<span class="dv">79</span>, <span class="dv">82</span>, <span class="dv">89</span>],
+                            [<span class="dv">74</span>, <span class="dv">70</span>, <span class="dv">75</span>],
+                            [<span class="dv">74</span>, <span class="dv">78</span>, <span class="dv">66</span>],
+                            [<span class="dv">87</span>, <span class="dv">65</span>, <span class="dv">87</span>]])
+    assert_equal(code_array(airport_codes), expected)</code></pre>
+</div>
+</section>
         </div>
       </div>
       </article>
