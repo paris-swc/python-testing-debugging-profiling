@@ -12,7 +12,7 @@ def find_first(data, element):
     return -1
 
 def check_data(target):
-    test_data = [3, 2, 8, 9, 3, 4, 7, 5]
+    test_data = [3, 2, 8, 9, 3, numpy.nan, 4, 7, 5]
     # We look for a zero in the data
     index = find_first(test_data, target)
     if index != -1:

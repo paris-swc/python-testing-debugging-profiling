@@ -30,7 +30,7 @@
           <h2 class="subtitle">Step-by-step debugging</h2>
           <section class="objectives panel panel-warning">
 <div class="panel-heading">
-<h2><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
+<h2 id="learning-objectives"><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
 </div>
 <div class="panel-body">
 <ul>
@@ -124,7 +124,7 @@ ipdb&gt; q</code></pre>
     <span class="kw">return</span> equalized.reshape(image.shape)</code></pre>
 <aside class="callout panel panel-info">
 <div class="panel-heading">
-<h2><span class="glyphicon glyphicon-pushpin"></span>Jupyter notebooks and external files</h2>
+<h2 id="jupyter-notebooks-and-external-files"><span class="glyphicon glyphicon-pushpin"></span>Jupyter notebooks and external files</h2>
 </div>
 <div class="panel-body">
 <p>The jupyter notebook is best suited to a programming style where all the code that is changed is included in the notebook: after a change to a function, the re-execution of the respective cell will update its definition. For more complex projects with functions defined in external files, there is a problem, though: Python only imports a module once, therefore if we edit the external file (e.g. in a text editor), then those changes are not taken into account, we will still use the version of the module when we (or another script/function) first imported it. This behavior can be very confusing… There are various ways to deal with this problem, but probably the easiest is to force the reload of all modules for every code execution:</p>
@@ -136,7 +136,8 @@ ipdb&gt; q</code></pre>
 <p>Let’s run the script again:</p>
 <pre class="sourceCode python"><code class="sourceCode python">% run do_equalization.py</code></pre>
 <div class="figure">
-<img src="img/08-debugging-output_1.png" alt="do_equalization output 1" /><p class="caption">do_equalization output 1</p>
+<img src="img/08-debugging-output_1.png" alt="do_equalization output 1" />
+<p class="caption">do_equalization output 1</p>
 </div>
 <p>Um, well, the script now runs without an error message but the result does not look any good. We don’t have an error that we can debug in a post-mortem way so instead we start the complete script under debugger control:</p>
 <pre class="sourceCode python"><code class="sourceCode python">% run -d do_equalization.py</code></pre>
@@ -160,7 +161,7 @@ ipdb&gt;</code></pre>
 <p>Just pressing return at the prompt will execute the previous command again (useful for <code>n</code>, <code>s</code>, <code>c</code>).</p>
 <aside class="callout panel panel-info">
 <div class="panel-heading">
-<h2><span class="glyphicon glyphicon-pushpin"></span>Debugging without IPython/Jupyter notebook</h2>
+<h2 id="debugging-without-ipythonjupyter-notebook"><span class="glyphicon glyphicon-pushpin"></span>Debugging without IPython/Jupyter notebook</h2>
 </div>
 <div class="panel-body">
 <p>In some situations you cannot use IPython, for instance to debug a script that wants to be called from the command line. In this case, you can call the script with <code>python -m pdb script.py</code> or <code>python -m ipdb scrip.py</code> (needs an installation of <code>ipdb</code>):</p>
@@ -219,14 +220,15 @@ array([ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.])</code></pre>
 <p>Now our script runs and gives the expected result:</p>
 <pre class="sourceCode python"><code class="sourceCode python">% run do_equalization.py</code></pre>
 <div class="figure">
-<img src="img/08-debugging-output_2.png" alt="do_equalization output 2" /><p class="caption">do_equalization output 2</p>
+<img src="img/08-debugging-output_2.png" alt="do_equalization output 2" />
+<p class="caption">do_equalization output 2</p>
 </div>
 <section class="challenge panel panel-success">
 <div class="panel-heading">
-<h2><span class="glyphicon glyphicon-pencil"></span>Debug step by step</h2>
+<h2 id="debug-step-by-step"><span class="glyphicon glyphicon-pencil"></span>Debug step by step</h2>
 </div>
 <div class="panel-body">
-<p>TODO</p>
+<p>Call the <code>check_data</code> function from the previous section with <code>numpy.nan</code> as its <code>target</code> argument. The result is not as expected, use the debugger to go through the code step by step and find the problem.</p>
 </div>
 </section>
         </div>

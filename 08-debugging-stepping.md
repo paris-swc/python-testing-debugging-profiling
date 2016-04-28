@@ -282,5 +282,7 @@ Now our script runs and gives the expected result:
 
 
 > ## Debug step by step {.challenge}
-> TODO
+> Call the `check_data` function from the previous section with `numpy.nan` as
+> its `target` argument. The result is not as expected, use the debugger to go
+> through the code step by step and find the problem.
 >
