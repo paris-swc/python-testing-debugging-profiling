@@ -45,7 +45,7 @@ def rescale(data, lower=0.0, upper=1.0):
     if not data_max > data_min:
       raise ValueError('Cannot rescale data: all values are identical.')
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     return rescaled_data
 ~~~
 
@@ -58,7 +58,7 @@ def rescale(data, lower=0.0, upper=1.0):
     data_max = numpy.max(data)
     assert data_max > data_min
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     return rescaled_data
 ~~~
 

@@ -30,7 +30,7 @@
           <h2 class="subtitle">Assertions</h2>
           <section class="objectives panel panel-warning">
 <div class="panel-heading">
-<h2><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
+<h2 id="learning-objectives"><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
 </div>
 <div class="panel-body">
 <ul>
@@ -59,7 +59,7 @@ AssertionError:</code></pre>
     <span class="kw">if</span> not data_max &gt; data_min:
       <span class="kw">raise</span> <span class="ot">ValueError</span>(<span class="st">&#39;Cannot rescale data: all values are identical.&#39;</span>)
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     <span class="kw">return</span> rescaled_data</code></pre>
 <p>The advantage of assertions is their ease of use and their “compactness” – they are rarely more than one line of code. They are therefore especially useful in situations where you think that the specific error condition will never be fulfilled and it therefore seems to be wasteful to check it and raise an exception. Imagine for example that the <code>rescale</code> function is only ever called from within one of your algorithms, and it is guaranteed that it will not be called with an array of identical values. In that case, you might not want to bother with the error message we put in previously. Adding an assertion is “cheaper” but will still guard you from problems in the future (e.g. when you decide to reuse your function in a different context):</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
@@ -67,7 +67,7 @@ AssertionError:</code></pre>
     data_max = numpy.<span class="dt">max</span>(data)
     <span class="kw">assert</span> data_max &gt; data_min
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     <span class="kw">return</span> rescaled_data</code></pre>
 <p>The general approach to check your expectations (be it with exceptions or with assertions) is called “defensive coding” and is a good habit to get into. Especially in complex algorithms assertions can also serve as documentation in the code and will greatly help with debugging by making your expections clear:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
@@ -123,7 +123,7 @@ assert_allclose(values, <span class="fl">0.1</span>, rtol=<span class="fl">1e-12
 <p>There are more helpful <code>assert_…</code> functions in that package, we’ll use them later in the lesson.</p>
 <section class="challenge panel panel-success">
 <div class="panel-heading">
-<h2><span class="glyphicon glyphicon-pencil"></span>The final touch</h2>
+<h2 id="the-final-touch"><span class="glyphicon glyphicon-pencil"></span>The final touch</h2>
 </div>
 <div class="panel-body">
 <ul>

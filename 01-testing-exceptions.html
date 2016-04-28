@@ -62,7 +62,7 @@
     data_min = numpy.<span class="dt">min</span>(data)
     data_max = numpy.<span class="dt">max</span>(data)
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     <span class="kw">return</span> rescaled_data</code></pre>
 <p>What is this function supposed to do for an array where all elements are identical? If we don’t handle this case, we will not get any error message but a “not-a-number” result because of the division by zero, together with a somewhat cryptical warning from numpy:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="dt">print</span>(rescale(numpy.array([<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>])))</code></pre>
@@ -76,7 +76,7 @@
     <span class="kw">if</span> not data_max &gt; data_min:
         <span class="kw">raise</span> <span class="ot">ValueError</span>(<span class="st">&#39;Cannot rescale data: all values are identical.&#39;</span>)
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     <span class="kw">return</span> rescaled_data</code></pre>
 <p>Once an exception is raised, it will be passed upward in the program scope:</p>
 <pre class="sourceCode python"><code class="sourceCode python">rescaled = rescale(numpy.array([<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>]))</code></pre>
@@ -90,7 +90,7 @@ ValueError                                Traceback (most recent call last)
      21     if not data_max &gt; data_min:
 ---&gt; 22         raise ValueError(&#39;Cannot rescale data: all values are identical.&#39;)
      23     normalized_data = (data - data_min) / (data_max - data_min)
-     24     rescaled_data = lower + upper * normalized_data
+     24     rescaled_data = lower + (upper - lower) * normalized_data
 
 ValueError: Cannot rescale data: all values are identical.</code></pre>
 <p>An exception can be used to trigger additional error messages or an alternative behavior. Rather than immediately halting code execution, the exception can be ‘caught’ upstream with a try-except block. When wrapped in a try-except block, the exception can be intercepted before it reaches global scope and halts execution.</p>
@@ -143,7 +143,7 @@ ValueError: zero-size array to reduction operation minimum which has no identity
     <span class="kw">if</span> not data_max &gt; data_min:
         <span class="kw">raise</span> <span class="ot">ValueError</span>(<span class="st">&#39;Cannot rescale data: all values are identical.&#39;</span>)
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     <span class="kw">return</span> rescaled_data</code></pre>
 <p>Now the problem should be clear and at the same time we don’t lose any information about the original error:</p>
 <pre class="sourceCode python"><code class="sourceCode python">rescaled = rescale(empty_array)</code></pre>
@@ -185,7 +185,7 @@ ValueError: Could not calculate the minimum of the input data -- maybe it is emp
     <span class="kw">if</span> not data_max &gt; data_min:
         <span class="kw">raise</span> <span class="ot">ValueError</span>(<span class="st">&#39;Cannot rescale data: all values are identical.&#39;</span>)
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     <span class="kw">return</span> rescaled_data</code></pre>
 <p>If a single function might raise more than one type of exception, each can be caught and handled separately.</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> rescale(data, lower=<span class="fl">0.0</span>, upper=<span class="fl">1.0</span>):
@@ -199,7 +199,7 @@ ValueError: Could not calculate the minimum of the input data -- maybe it is emp
     <span class="kw">if</span> not data_max &gt; data_min:
         <span class="kw">raise</span> <span class="ot">ValueError</span>(<span class="st">&#39;Cannot rescale data: all values are identical.&#39;</span>)
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     <span class="kw">return</span> rescaled_data</code></pre>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="dt">print</span>(<span class="st">&#39;rescaled empty array: &#39;</span>, rescale(empty_array))
 <span class="dt">print</span>(<span class="st">&#39;rescaled non-numerical array:&#39;</span>, rescale(numpy.array([<span class="st">&#39;not&#39;</span>, <span class="st">&#39;numbers&#39;</span>])))</code></pre>

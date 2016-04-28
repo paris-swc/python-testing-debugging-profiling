@@ -44,7 +44,7 @@ def rescale(data, lower=0.0, upper=1.0):
     data_min = numpy.min(data)
     data_max = numpy.max(data)
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     return rescaled_data
 ~~~
 
@@ -76,7 +76,7 @@ def rescale(data, lower=0.0, upper=1.0):
     if not data_max > data_min:
         raise ValueError('Cannot rescale data: all values are identical.')
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     return rescaled_data
 ~~~
 
@@ -96,7 +96,7 @@ ValueError                                Traceback (most recent call last)
      21     if not data_max > data_min:
 ---> 22         raise ValueError('Cannot rescale data: all values are identical.')
      23     normalized_data = (data - data_min) / (data_max - data_min)
-     24     rescaled_data = lower + upper * normalized_data
+     24     rescaled_data = lower + (upper - lower) * normalized_data
 
 ValueError: Cannot rescale data: all values are identical.
 ~~~
@@ -175,7 +175,7 @@ def rescale(data, lower=0.0, upper=1.0):
     if not data_max > data_min:
         raise ValueError('Cannot rescale data: all values are identical.')
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     return rescaled_data
 ~~~
 
@@ -230,7 +230,7 @@ def rescale(data, lower=0.0, upper=1.0):
     if not data_max > data_min:
         raise ValueError('Cannot rescale data: all values are identical.')
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     return rescaled_data
 ~~~
 
@@ -249,7 +249,7 @@ def rescale(data, lower=0.0, upper=1.0):
     if not data_max > data_min:
         raise ValueError('Cannot rescale data: all values are identical.')
     normalized_data = (data - data_min) / (data_max - data_min)
-    rescaled_data = lower + upper * normalized_data
+    rescaled_data = lower + (upper - lower) * normalized_data
     return rescaled_data
 ~~~
 
