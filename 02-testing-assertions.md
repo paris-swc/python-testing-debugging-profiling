@@ -135,14 +135,14 @@ Since this an issue that one has to deal with all the time in testing numerical 
 
 ~~~ {.python}
 values = numpy.array([0.3, 3*0.1, 0.1+0.1+0.1, 0.6/2])
-print(values == 0.1)
+print(values == 0.3)
 ~~~
 ~~~ {.output}
 [ True False False  True]
 ~~~
 ~~~ {.python}
 from numpy.testing.utils import assert_allclose
-assert_allclose(values, 0.1, rtol=1e-12)
+assert_allclose(values, 0.3, rtol=1e-12)
 print('no assertion raised')
 ~~~
 ~~~ {.output}
