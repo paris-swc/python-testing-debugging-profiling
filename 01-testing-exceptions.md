@@ -296,6 +296,11 @@ TypeError                                 Traceback (most recent call last)
 TypeError: Can only re-scale numerical data.
 ~~~
 
+> ## Catch all {.challenge}
+> Sometimes it is not obvious what type of exception to catch and an easy
+> solution seems to be to catch *any* exception with `except Exception`. Why is
+> this not a good idea?
+
 > ## Checking or trying? {.challenge}
 > What is the advantage of using `try`/`except` over an explicit type check?
 > Compare these two functions that return the minimum and maximum as a tuple:
@@ -317,11 +322,6 @@ TypeError: Can only re-scale numerical data.
 > ```
 > Hint: Could the input `data` be something else than a numpy array and still be
 > meaningful?
-
-> ## Catch all {.challenge}
-> Sometimes it is not obvious what type of exception to catch and an easy
-> solution seems to be to catch *any* exception with `except Exception`. Why is
-> this not a good idea?
 
 Exceptions can be very helpful to the user. However, for checking the internal
 consistency of an algorithm, a simpler mechanism called *assertions* can be
