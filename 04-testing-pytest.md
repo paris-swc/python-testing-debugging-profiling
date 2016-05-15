@@ -63,8 +63,8 @@ def test_2d():
                     test_data)
 ~~~
 
-Now we can run the `pytest` utility in the directory where we stored the test
-file:
+Now we can run the [*pytest* utility](http://pytest.org) in the directory where
+we stored the test file:
 
 ~~~ {.bash}
 $ py.test
@@ -96,22 +96,35 @@ test_whiten.py:17: AssertionError
 ========================== 1 failed, 1 passed in 0.12 seconds ==========================
 ~~~
 
+> ## Alternatives to pytest {.callout}
+> An alternative to `pytest` are the [*nose*](https://nose.readthedocs.io) and
+> [*nose2*](https://nose2.readthedocs.io) testing frameworks. In the
+> examples shown here, they (and their command line tools `nosetests` and
+> `nose2`) can be used mostly interchangeably with *pytest*, but *pytest* makes
+> it somewhat easier to set up more complex tests as well and provides in general
+> a more helpful display of failed assertions.
+> Finally, unit testing can also be done based exclusively on Python's standard library
+> (most other testing frameworks are built on top of that approach). For this, the
+> library includes the *unittest* module, but this module requires more
+["boilerplate" code](https://en.wikipedia.org/wiki/Boilerplate_code)
+> to create unit tests (simple functions named `test_...` are not enough).
+
 In the above case, the pytest package 'sniffed-out' the tests in the
 directory and ran them together to produce a report of the sum of the files and
 functions matching having the name `test_*`.
 
 The major boon a testing framework provides is exactly that, a utility to find and run the
 tests automatically. With `pytest`, this is the command-line tool called
-_py.test_.  When _py.test_ is run, it will search all the directories whose names start or
-end with the word _test_, find all of the Python modules in these directories
-whose names
-start or end with _test_, import them, and run all of the functions and classes
-whose names start with _test_.
+`py.test`.  When `py.test` is run, it will search all the directories whose names start or
+end with the word `test`, find all of the Python modules in these directories
+whose names start or end with `test`, import them, and run all of the functions and classes
+whose names start with `test`.
 This automatic registration of test code saves tons of human time and allows us to
 focus on what is important: writing more tests.
 
-When you run _py.test_, it will print a dot (`.`) on the screen for every test
-that passes, and an `F` for every test that fails. After the dots, _py.test_
+When you run `py.test`, it will print first some general information about the
+setup and then the name of every test file togehter with a dot (`.`) for every test
+that passes, and an `F` for every test that fails. After the dots, `py.test`
 will print summary information.
 
 > ## More information / less information {.callout}
@@ -148,6 +161,6 @@ test_whiten.py ..
 >
 > Add more tests to `test_whiten.py` and take care of the edge cases.
 
-As we write more code, we would write more tests, and _py.test_ would produce
+As we write more code, we would write more tests, and `py.test` would produce
 more dots.  Each passing test is a small, satisfying reward for having written
 quality scientific software.

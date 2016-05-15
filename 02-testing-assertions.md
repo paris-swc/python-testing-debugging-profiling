@@ -155,4 +155,9 @@ There are more helpful `assert_…` functions in that package, we'll use them la
 > * Replace the problematic assertions with `assert_allclose`
 > * Before returning the result -- what assertion(s) could we use to check the result?
 
-TODO: some summary
+Assertions are a great tool to embed checks into your code quickly and
+non-intrusively. However, the checks they perform are necessarily simple (they
+are executed during the run of the program, making computationally intensive
+checks would therefore slow the program down) and they are therefore only the
+first step towards writing code we can trust to give correct results. The next
+step is to write explicit *tests*, covered in the following section. 

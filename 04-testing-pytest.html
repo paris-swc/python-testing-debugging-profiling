@@ -30,7 +30,7 @@
           <h2 class="subtitle">Running Tests with pytest</h2>
           <section class="objectives panel panel-warning">
 <div class="panel-heading">
-<h2><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
+<h2 id="learning-objectives"><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
 </div>
 <div class="panel-body">
 <ul>
@@ -80,7 +80,7 @@
     assert_allclose(whitened.std(), <span class="dv">1</span>)
     assert_allclose(whitened*test_data.std() + test_data.mean(),
                     test_data)</code></pre>
-<p>Now we can run the <code>pytest</code> utility in the directory where we stored the test file:</p>
+<p>Now we can run the <a href="http://pytest.org"><em>pytest</em> utility</a> in the directory where we stored the test file:</p>
 <pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">py.test</span></code></pre>
 <pre class="output"><code>================================= test session starts ==================================
 platform linux -- Python 3.5.1, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
@@ -106,12 +106,20 @@ E        y: array(0)
 
 test_whiten.py:17: AssertionError
 ========================== 1 failed, 1 passed in 0.12 seconds ==========================</code></pre>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h2 id="alternatives-to-pytest"><span class="glyphicon glyphicon-pushpin"></span>Alternatives to pytest</h2>
+</div>
+<div class="panel-body">
+<p>An alternative to <code>pytest</code> are the <a href="https://nose.readthedocs.io"><em>nose</em></a> and <a href="https://nose2.readthedocs.io"><em>nose2</em></a> testing frameworks. In the examples shown here, they (and their command line tools <code>nosetests</code> and <code>nose2</code>) can be used mostly interchangeably with <em>pytest</em>, but <em>pytest</em> makes it somewhat easier to set up more complex tests as well and provides in general a more helpful display of failed assertions. Finally, unit testing can also be done based exclusively on Python’s standard library (all testing frameworks are built on top of that approach). For this, the library includes the <em>unittest</em> module, but this module requires more <a href="https://en.wikipedia.org/wiki/Boilerplate_code">“boilerplate” code</a> to create unit tests (simple functions named <code>test_...</code> are not enough).</p>
+</div>
+</aside>
 <p>In the above case, the pytest package ‘sniffed-out’ the tests in the directory and ran them together to produce a report of the sum of the files and functions matching having the name <code>test_*</code>.</p>
 <p>The major boon a testing framework provides is exactly that, a utility to find and run the tests automatically. With <code>pytest</code>, this is the command-line tool called <em>py.test</em>. When <em>py.test</em> is run, it will search all the directories whose names start or end with the word <em>test</em>, find all of the Python modules in these directories whose names start or end with <em>test</em>, import them, and run all of the functions and classes whose names start with <em>test</em>. This automatic registration of test code saves tons of human time and allows us to focus on what is important: writing more tests.</p>
 <p>When you run <em>py.test</em>, it will print a dot (<code>.</code>) on the screen for every test that passes, and an <code>F</code> for every test that fails. After the dots, <em>py.test</em> will print summary information.</p>
 <aside class="callout panel panel-info">
 <div class="panel-heading">
-<h2><span class="glyphicon glyphicon-pushpin"></span>More information / less information</h2>
+<h2 id="more-information-less-information"><span class="glyphicon glyphicon-pushpin"></span>More information / less information</h2>
 </div>
 <div class="panel-body">
 <p>To see more information, such as the name of every test function, use the <code>-v</code> (for “verbose”) command line argument. To see less, use <code>-q</code> (for “quiet”).</p>
@@ -132,13 +140,13 @@ test_whiten.py ..
 =============================== 2 passed in 0.10 seconds ===============================</code></pre>
 <section class="challenge panel panel-success">
 <div class="panel-heading">
-<h2><span class="glyphicon glyphicon-pencil"></span>Add more tests</h2>
+<h2 id="add-more-tests"><span class="glyphicon glyphicon-pencil"></span>Add more tests</h2>
 </div>
 <div class="panel-body">
 <p>Add more tests to <code>test_whiten.py</code> and take care of the edge cases.</p>
 </div>
 </section>
-<p>As we write more code, we would write more tests, and <em>py.test</em> would produce more dots. Each passing test is a small, satisfying reward for having written quality scientific software.</p>
+<p>As we write more code, we would write more tests, and <code>py.test</code> would produce more dots. Each passing test is a small, satisfying reward for having written quality scientific software.</p>
         </div>
       </div>
       </article>
