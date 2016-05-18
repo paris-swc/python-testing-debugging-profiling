@@ -28,7 +28,7 @@
         <div class="col-md-10 col-md-offset-1">
                     <a href="index.html"><h1 class="title">Profiling</h1></a>
           <h2 class="subtitle">Total runtime measurements</h2>
-          <p>Ipython offers two useful commands to measure the time a single line or cell of code takes to execute:</p>
+          <p>Ipython and the jupyter notebook offer two useful commands to measure the time a single line or cell of code takes to execute:</p>
 <ul>
 <li><code>%time</code> will time the total runtime in a simple way (much like the command <code>time</code> in a UNIX shell) – if your command/script takes a very long time to run, this is what you want to use.</li>
 <li><code>%timeit</code> will repeat the time measurements many times: by default it will do 3 trials, where each trial will execute the command N times. The number N is chosen so that the total test run takes a couple of seconds and the reported time will be the one of the best trial. This gives much more precise measurements for short-running commands.</li>

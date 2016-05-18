@@ -36,22 +36,24 @@
 <p>“We should forget about small efficiencies, say about 97% of the time: <strong>premature optimization is the root of all evil</strong>. Yet we should not pass up our opportunities in that critical 3%”</p>
 </div>
 </aside>
-<p>Know what to optimize, spend the time where it is worth it:</p>
+<p>That a program works and gives the correct results is of course essential. However, this alone might not be enough if running the program takes a very long time. This is where you start about thinking how to make your program faster and the first part of this process is called <em>profiling</em>, finding out where the program spends its time and where the optimization effort should therefore be spend. When confronted with a slowly running program most programmers have an intuition about how to optimize the program and are tempted to start working on it immediately, skipping the profiling process completely. Unfortunately, these intuitions turn out to be wrong more often than not: either in a fundamental way, i.e. the optimized code is actually <em>slower</em> than before, or (and this is very common) the part of the code that was optimized is not the “bottleneck” for the processing speed, and a lot of development time was spent on achieving a small performance increase. Even worth, optimization comes often with a cost (in addition to the development time spent on it): the optimized code might be less readable, less general and less robust against errors.</p>
+<p>Here’s a simple example showing the importance of profiling before Optimizing (from the Wikipedia article on <a href="https://en.wikipedia.org/wiki/Amdahl&#39;s_law">Amdahl’s law</a>): Assume a task has two parts <em>A</em> and <em>B</em>. Without profiling, you might start to optimize task <em>B</em> and after working on it for a long time, you succeed in making it run in only 1/5 of the original time. However, it turns out that <em>B</em> was only taking up a small part of the original run time and therefore focussing on <em>A</em> would have been the better approach. In this example, reducing the run time of <em>A</em> to 50% of its original run time (presumably easier than optimizing <em>B</em> to 20%) would have had a bigger impact on the total run time.</p>
 <div class="figure">
 <img src="img/Optimizing-different-parts.svg" alt="Optimizing two tasks (By Gorivero, Wikimedia, Public Domain)" />
 <p class="caption">Optimizing two tasks (<a href="https://commons.wikimedia.org/w/index.php?curid=3366573">By Gorivero, Wikimedia, Public Domain</a>)</p>
 </div>
-<p>General approach:</p>
+<p>The general approach for profiling should therefore resemble the following:</p>
 <ol style="list-style-type: decimal">
-<li>Make sure that things are <em>correct</em> (fast but wrong does not help you)!</li>
+<li>Make sure that things are <em>correct</em> (“fast but wrong” does not help you)!</li>
 <li>Write tests so that you can be confident that your code is still correct after optimzing it.</li>
-<li>Measure the total run time, decide whether you need to optimize the code in the first place (see graphic below).</li>
+<li>Measure the total run time, decide whether you need to optimize the code in the first place.</li>
 <li>Profile the code to decide where an optimization could be the most useful.</li>
 <li>Optimize it and go back</li>
 </ol>
+<p>Never forget that for code that is only run once or few times, optimization might not be a good use of your time:</p>
 <div class="figure">
-<img src="img/is_it_worth_the_time.png" alt="Is it worth the time? XKCD comic, licensed CC BY-NC 2.5" />
-<p class="caption">Is it worth the time? <a href="http://xkcd.com/1205/">XKCD comic</a>, licensed <a href="http://creativecommons.org/licenses/by-nc/2.5/">CC BY-NC 2.5</a></p>
+<img src="img/is_it_worth_the_time.png" alt="Is it worth the time? XKCD comic by Randall Munroe, licensed CC BY-NC 2.5" />
+<p class="caption">Is it worth the time? <a href="http://xkcd.com/1205/">XKCD comic by Randall Munroe</a>, licensed <a href="http://creativecommons.org/licenses/by-nc/2.5/">CC BY-NC 2.5</a></p>
 </div>
         </div>
       </div>

@@ -211,9 +211,10 @@ def find_first(data, element):
     return -1
 ~~~
 
-Using a counter and indexing into a list at every iteration of a loop is a
-often considered to be a so-called
-"[anti-pattern](https://en.wikipedia.org/wiki/Anti-pattern)" in Python.
+Using a counter and indexing into a list at every iteration of a loop is something
+that might feel natural when you have experience in another programming language
+but in Python it is often considered to be a so-called
+"[anti-pattern](https://en.wikipedia.org/wiki/Anti-pattern)".
 
 > ## Post-mortem debugging with pytest {.callout}
 > You can run your test suite with pytest and make pytest open a debugger
@@ -275,3 +276,7 @@ often considered to be a so-called
 >                             [87, 65, 87]])
 >     assert_equal(code_array(airport_codes), expected)
 > ~~~
+
+Not every error in the code leads to an exception -- the ones that are most difficult to
+debug usually don't! We will therefore next look at using the debugger right from the
+start of a program.

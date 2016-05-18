@@ -23,8 +23,9 @@ This is analogous to experiment design in the experimental science world:
 - At the beginning of a new project, tests can be used to help guide the
   overall architecture of the project.
 - The act of writing tests can help clarify how the software should be perform when you are done.
-- In fact, starting to write the tests _before_ you even write the software
-  might be advisable. (Such a practice is called _test-driven development_)
+- In fact, starting to write the tests *before* you even write the software
+  might be advisable. (Such a practice is called
+  [*test-driven development*](https://en.wikipedia.org/wiki/Test-driven_development))
 
 *Exceptions and Assertions*: While writing code, `exceptions` and `assertions`
 can be added to sound an alarm as runtime problems come up. These kinds of

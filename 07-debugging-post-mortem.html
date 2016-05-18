@@ -146,7 +146,7 @@ IndexError: list index out of range</code></pre>
             <span class="kw">return</span> index
 
     <span class="kw">return</span> -<span class="dv">1</span></code></pre>
-<p>Using a counter and indexing into a list at every iteration of a loop is a often considered to be a so-called “<a href="https://en.wikipedia.org/wiki/Anti-pattern">anti-pattern</a>” in Python.</p>
+<p>Using a counter and indexing into a list at every iteration of a loop is something that might feel natural when you have experience in another programming language but in Python it is often considered to be a so-called “<a href="https://en.wikipedia.org/wiki/Anti-pattern">anti-pattern</a>”.</p>
 <aside class="callout panel panel-info">
 <div class="panel-heading">
 <h2 id="post-mortem-debugging-with-pytest"><span class="glyphicon glyphicon-pushpin"></span>Post-mortem debugging with pytest</h2>
@@ -208,6 +208,7 @@ test_whiten.py:17: AssertionError
     assert_equal(code_array(airport_codes), expected)</code></pre>
 </div>
 </section>
+<p>Not every error in the code leads to an exception – the ones that are most difficult to debug usually don’t! We will therefore next look at using the debugger right from the start of a program.</p>
         </div>
       </div>
       </article>

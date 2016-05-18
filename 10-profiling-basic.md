@@ -5,8 +5,8 @@ subtitle: Total runtime measurements
 minutes: 10
 ---
 
-Ipython offers two useful commands to measure the time a single line or cell of
-code takes to execute:
+Ipython and the jupyter notebook offer two useful commands to measure the time
+a single line or cell of code takes to execute:
 
 * `%time` will time the total runtime in a simple way
 (much like the command `time` in a UNIX shell) -- if your command/script takes
