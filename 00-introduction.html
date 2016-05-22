@@ -39,7 +39,20 @@
 </ul>
 </div>
 </section>
-<p>These notes are still in a draft stage and several bits and pieces (in particular introductions and summaries) are still missing.</p>
+<p>This lesson serves as a brief introduction to the following topics (each well worthy of a lesson of their own):</p>
+<ul>
+<li><strong>testing</strong>: the process of making sure that a program does what it is suppposed to do. Achieved by 1) writing code (a <em>test</em>) that runs a part of the main code and compares the result to the expected result and 2) automatizing the process of running those tests.</li>
+<li><strong>debugging</strong>: the process of finding the source of errors in the code, in particular with the help of a <em>symbolic debugger</em>.</li>
+<li><strong>profiling</strong>: the first step of optimizing the execution speed of a program by measuring its runtime. These measures can be taken on various levels, e.g.: the complete runtime of the full code or a part of it; the runtime for each function in the code; the runtime of each line of code in a function.</li>
+</ul>
+<p>A simplified process of code development, involving all the three elements can look like the following:</p>
+<ol style="list-style-type: decimal">
+<li>Write code that solves a specific problem</li>
+<li>Write <em>tests</em> for that code, showing that it actually solves the problem (taking special care of corner and edge cases)</li>
+<li>When tests fail, <em>debug</em> the code to find the root cause.</li>
+<li>If the code runs too slowly for the purpose at hand, <em>profile</em> it to find out where the time is spent and optimize the code (using the test suite to verify that everything is still working correctly)</li>
+</ol>
+<p>Some developers recommend to switch step 1 and 2 around, i.e. to actually write the tests <em>before</em> the code (therefore starting with a test suite full of failing tests). This is called <a href="https://en.wikipedia.org/wiki/Test-driven_development">test-driven development</a> and adopting it at least partially is certainly a good idea: whenever a bug occurs, writing first a test that reliably fails can dramatically help in the later stages of debugging it.</p>
         </div>
       </div>
       </article>
