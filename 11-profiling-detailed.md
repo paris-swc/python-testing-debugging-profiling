@@ -104,12 +104,11 @@ lot of time and is called more often than expected (e.g. we calculate a measure
 on 1000 values and expect a function to be called about a 1000 times as well
 but it is called 1000*1000 times instead).
 
-
-
 The output of a profiler run can easily become overwhelming in bigger projects.
 It can therefore be useful to use a graphical tool that represents this
 information in a more accessible and interactive way. One such tool is
-`snakeviz` that can also be used directly from ipython or a jupyter notebook.
+*[snakeviz](https://jiffyclub.github.io/snakeviz/)* that can also be used
+directly from ipython or a jupyter notebook.
 
 Let's have a another look at the `equalize` function we used earlier:
 
@@ -119,7 +118,7 @@ def equalize(image, n_bins=256):
     hist, bins = numpy.histogram(image.flatten(), bins=bins, density=True)
     cdf = hist.cumsum() / n_bins
     # Invert the CDF by using numpy's interp function
-    equalized = numpy.interp(flat_image, bins[:-1], cdf)
+    equalized = numpy.interp(image.flatten(), bins[:-1], cdf)
 
     # All this was performed on flattened versions of the image, reshape the
     # equalized image back to the original shape
@@ -132,18 +131,20 @@ We'll again load our example image:
 image = plt.imread('Unequalized_Hawkes_Bay_NZ.png')[:, :, 0]
 ~~~
 
-With `snakeviz` installed, we can load the `snakeviz` magic:
+With *snakeviz* installed, we can load the `snakeviz` magic:
 
 ~~~ {.python}
-% load_ext snakeviz
+%load_ext snakeviz
 ~~~
 
 We can then use `%snakeviz` in the same way we previously used `%prun` and it
 will show us a graphical representation of where the time was spent:
 
 ~~~ {.python}
-% snakeviz
+%snakeviz equalize(image)
 ~~~
+
+![Part of the snakeviz output: A "sunburst" plot showing the runtime spend in various parts of the function call. The center corresponds to the function we are profiling, each layer shows the relative amount of time spend in functions called by functions in the previous layer.](img/snakeviz_screenshot.png)
 
 > ## snakeviz without ipython/jupyter notbook {.callout}
 > We can save the profiling information of a Python script to disk:
@@ -167,11 +168,11 @@ various places so that their total runtime is significant.
 time, but they are less useful to see optimization potential in single
 functions. Another type of profiling is line-based profiling which measures the
 runtime of every line in one or more functions. This functionality is provided
-by the `line_profiler` package which also provides a magic extension for
-ipython:
+by the *[line_profiler](https://github.com/rkern/line_profiler)* package which
+also provides a magic extension for ipython and the jupyter notebook:
 
 ~~~ {.python}
-% load_ext line_profiler
+%load_ext line_profiler
 ~~~
 
 The magic command is `%lprun` and can be used in a similar way to `%prun` and

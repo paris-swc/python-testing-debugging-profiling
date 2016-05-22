@@ -77,24 +77,28 @@ Wall time: 7.52 s
 </div>
 </section>
 <p>Optimizing a calculation by using a fundamentally different approach is called “algorithmic optimization” and it is the potentially most powerful way to increase the performance of a program. Whenever the runtime of a program appears to be slow, the first check should be whether there is a function that takes a lot of time and is called more often than expected (e.g. we calculate a measure on 1000 values and expect a function to be called about a 1000 times as well but it is called 1000*1000 times instead).</p>
-<p>The output of a profiler run can easily become overwhelming in bigger projects. It can therefore be useful to use a graphical tool that represents this information in a more accessible and interactive way. One such tool is <code>snakeviz</code> that can also be used directly from ipython or a jupyter notebook.</p>
+<p>The output of a profiler run can easily become overwhelming in bigger projects. It can therefore be useful to use a graphical tool that represents this information in a more accessible and interactive way. One such tool is <em><a href="https://jiffyclub.github.io/snakeviz/">snakeviz</a></em> that can also be used directly from ipython or a jupyter notebook.</p>
 <p>Let’s have a another look at the <code>equalize</code> function we used earlier:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> equalize(image, n_bins=<span class="dv">256</span>):
     bins = numpy.linspace(<span class="dv">0</span>, <span class="dv">1</span>, n_bins, endpoint=<span class="ot">True</span>)
     hist, bins = numpy.histogram(image.flatten(), bins=bins, density=<span class="ot">True</span>)
     cdf = hist.cumsum() / n_bins
     <span class="co"># Invert the CDF by using numpy&#39;s interp function</span>
-    equalized = numpy.interp(flat_image, bins[:-<span class="dv">1</span>], cdf)
+    equalized = numpy.interp(image.flatten(), bins[:-<span class="dv">1</span>], cdf)
 
     <span class="co"># All this was performed on flattened versions of the image, reshape the</span>
     <span class="co"># equalized image back to the original shape</span>
     <span class="kw">return</span> equalized.reshape(image.shape)</code></pre>
 <p>We’ll again load our example image:</p>
 <pre class="sourceCode python"><code class="sourceCode python">image = plt.imread(<span class="st">&#39;Unequalized_Hawkes_Bay_NZ.png&#39;</span>)[:, :, <span class="dv">0</span>]</code></pre>
-<p>With <code>snakeviz</code> installed, we can load the <code>snakeviz</code> magic:</p>
-<pre class="sourceCode python"><code class="sourceCode python">% load_ext snakeviz</code></pre>
+<p>With <em>snakeviz</em> installed, we can load the <code>snakeviz</code> magic:</p>
+<pre class="sourceCode python"><code class="sourceCode python">%load_ext snakeviz</code></pre>
 <p>We can then use <code>%snakeviz</code> in the same way we previously used <code>%prun</code> and it will show us a graphical representation of where the time was spent:</p>
-<pre class="sourceCode python"><code class="sourceCode python">% snakeviz</code></pre>
+<pre class="sourceCode python"><code class="sourceCode python">%snakeviz equalize(image)</code></pre>
+<div class="figure">
+<img src="img/snakeviz_screenshot.png" alt="Part of the snakeviz output: A sunburst plot showing the runtime spend in various parts of the function call. The center corresponds to the function we are profiling, each layer shows the relative amount of time spend in functions called by functions in the previous layer." />
+<p class="caption">Part of the snakeviz output: A “sunburst” plot showing the runtime spend in various parts of the function call. The center corresponds to the function we are profiling, each layer shows the relative amount of time spend in functions called by functions in the previous layer.</p>
+</div>
 <aside class="callout panel panel-info">
 <div class="panel-heading">
 <h2 id="snakeviz-without-ipythonjupyter-notbook"><span class="glyphicon glyphicon-pushpin"></span>snakeviz without ipython/jupyter notbook</h2>
@@ -107,8 +111,8 @@ Wall time: 7.52 s
 </div>
 </aside>
 <p>This representation is useful for a global overview of the runtime of the various functions in a project. It might uncover functions that do not seem to be worth optimizing because of their short runtime but are in fact called from various places so that their total runtime is significant.</p>
-<p><code>%prun</code> and <code>%snakeviz</code> give information about which functions take up the most time, but they are less useful to see optimization potential in single functions. Another type of profiling is line-based profiling which measures the runtime of every line in one or more functions. This functionality is provided by the <code>line_profiler</code> package which also provides a magic extension for ipython:</p>
-<pre class="sourceCode python"><code class="sourceCode python">% load_ext line_profiler</code></pre>
+<p><code>%prun</code> and <code>%snakeviz</code> give information about which functions take up the most time, but they are less useful to see optimization potential in single functions. Another type of profiling is line-based profiling which measures the runtime of every line in one or more functions. This functionality is provided by the <em><a href="https://github.com/rkern/line_profiler">line_profiler</a></em> package which also provides a magic extension for ipython and the jupyter notebook:</p>
+<pre class="sourceCode python"><code class="sourceCode python">%load_ext line_profiler</code></pre>
 <p>The magic command is <code>%lprun</code> and can be used in a similar way to <code>%prun</code> and <code>%snakeviz</code>, but in contrast to those other profiling functions it needs the specification of the functions of interest in addition:</p>
 <pre class="sourceCode python"><code class="sourceCode python">%lprun -f equalize equalize(image)</code></pre>
 <pre class="output"><code>Timer unit: 1e-06 s
