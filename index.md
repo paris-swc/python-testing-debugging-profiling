@@ -15,7 +15,10 @@ title: Testing, debugging, and profiling
 
 > ## Getting ready {.getready}
 >
-> This lesson is based on Python 3 and numpy, and uses tools such as ipython (or the jupyter notebook) and pynest. If you have a standard installation of Anaconda, then you should have all you need.
+> This lesson is based on *Python 3*, *numpy*, and *ipython* (or the
+*jupyter notebook*) and introduces a few tools: *pytest*, *line_profiler*, and
+*snakeviz* (all included in a standard installation of
+[Anaconda](https://www.continuum.io/downloads)).
 
 Material: [Example files (zip)](testing_debugging_profiling.zip)
 
