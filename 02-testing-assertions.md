@@ -70,8 +70,8 @@ def rescale(data, lower=0.0, upper=1.0):
     data_max = numpy.max(data)
     assert data_max > data_min
     normalized_data = (data - data_min) / (data_max - data_min)
-    assert normalized_numpy.min(data) == 0.0
-    assert normalized_numpy.max(data) == 1.0
+    assert numpy.min(normalized_data) == 0.0
+    assert numpy.max(normalized_data) == 1.0
     rescaled_data = lower + (upper - lower) * normalized_data
     return rescaled_data
 ~~~
@@ -103,8 +103,8 @@ def rescale(data, lower=0.0, upper=1.0):
     data_max = numpy.max(data)
     assert data_max > data_min
     normalized_data = data / (data_max - data_min) - data_min / (data_max - data_min)
-    assert normalized_numpy.min(data) == 0.0
-    assert normalized_numpy.max(data) == 1.0
+    assert numpy.min(normalized_data) == 0.0
+    assert numpy.max(normalized_data) == 1.0
     rescaled_data = lower + (upper - lower) * normalized_data
     return rescaled_data
 ~~~
@@ -123,8 +123,8 @@ AssertionError                            Traceback (most recent call last)
 
 <ipython-input-2-49242bbbe0b1> in rescale(data, lower, upper)
       5     normalized_data = data / (data_max - data_min) - data_min / (data_max - data_min)
-      6     assert normalized_numpy.min(data) == 0.0
-----> 7     assert normalized_numpy.max(data) == 1.0
+      6     assert numpy.min(normalized_data) == 0.0
+----> 7     assert numpy.max(normalized_data) == 1.0
       8     rescaled_data = lower + (upper - lower) * normalized_data
       9     return rescaled_data
 
