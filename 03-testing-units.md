@@ -27,8 +27,8 @@ run it overnight to analyse our data.
 
 This is where unit tests come in.
 Unit tests are so called because they exercise the functionality of the code by
-interrogating individual functions and methods. Fuctions and methods can often
-be considered the atomic units of software because they are indivisble.
+interrogating individual functions and methods. Functions and methods can often
+be considered the atomic units of software because they are indivisible.
 However, what is considered to be the smallest code _unit_ is subjective. The
 body of a function can be long or short, and shorter functions are arguably
 more unit-like than long ones.
@@ -41,7 +41,7 @@ practically (a function is self-contained and well defined), then it is a unit.
 > ## Functions are Like Paragraphs {.callout}
 >
 > Recall that humans can only hold a few ideas in our heads at once. Paragraphs
-> in books, for example, become unwieldy after a few lines. Functions, generaly,
+> in books, for example, become unwieldy after a few lines. Functions, generally,
 > shouldn't be longer than paragraphs.
 > Robert C. Martin, the author of "Clean Code" said : "The first rule of
 > functions is that _they should be small_. The second rule of functions is that

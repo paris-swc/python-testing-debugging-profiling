@@ -244,7 +244,7 @@ def rescale(data, lower=0.0, upper=1.0):
     except ValueError:
         return numpy.array([])
     except TypeError:
-      raise TypeError('Can only re-scale numerical data.')
+        raise TypeError('Can only re-scale numerical data.')
     data_max = numpy.max(data)
     if not data_max > data_min:
         raise ValueError('Cannot rescale data: all values are identical.')
