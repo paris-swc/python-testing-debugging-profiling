@@ -30,7 +30,7 @@
           <h2 class="subtitle">Running Tests with pytest</h2>
           <section class="objectives panel panel-warning">
 <div class="panel-heading">
-<h2 id="learning-objectives"><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
+<h2><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
 </div>
 <div class="panel-body">
 <ul>
@@ -108,7 +108,7 @@ test_whiten.py:17: AssertionError
 ========================== 1 failed, 1 passed in 0.12 seconds ==========================</code></pre>
 <aside class="callout panel panel-info">
 <div class="panel-heading">
-<h2 id="alternatives-to-pytest"><span class="glyphicon glyphicon-pushpin"></span>Alternatives to pytest</h2>
+<h2><span class="glyphicon glyphicon-pushpin"></span>Alternatives to pytest</h2>
 </div>
 <div class="panel-body">
 <p>An alternative to <code>pytest</code> are the <a href="https://nose.readthedocs.io"><em>nose</em></a> and <a href="https://nose2.readthedocs.io"><em>nose2</em></a> testing frameworks. In the examples shown here, they (and their command line tools <code>nosetests</code> and <code>nose2</code>) can be used mostly interchangeably with <em>pytest</em>, but <em>pytest</em> makes it somewhat easier to set up more complex tests as well and provides in general a more helpful display of failed assertions. Finally, unit testing can also be done based exclusively on Python’s standard library (most other testing frameworks are built on top of that approach). For this, the library includes the <em>unittest</em> module, but this module requires more <a href="https://en.wikipedia.org/wiki/Boilerplate_code">“boilerplate” code</a> to create unit tests (simple functions named <code>test_...</code> are not enough).</p>
@@ -119,7 +119,7 @@ test_whiten.py:17: AssertionError
 <p>When you run <code>py.test</code>, it will print first some general information about the setup and then the name of every test file togehter with a dot (<code>.</code>) for every test that passes, and an <code>F</code> for every test that fails. After the dots, <code>py.test</code> will print summary information.</p>
 <aside class="callout panel panel-info">
 <div class="panel-heading">
-<h2 id="more-information-less-information"><span class="glyphicon glyphicon-pushpin"></span>More information / less information</h2>
+<h2><span class="glyphicon glyphicon-pushpin"></span>More information / less information</h2>
 </div>
 <div class="panel-body">
 <p>To see more information, such as the name of every test function, use the <code>-v</code> (for “verbose”) command line argument. To see less, use <code>-q</code> (for “quiet”).</p>
@@ -140,7 +140,7 @@ test_whiten.py ..
 =============================== 2 passed in 0.10 seconds ===============================</code></pre>
 <section class="challenge panel panel-success">
 <div class="panel-heading">
-<h2 id="add-more-tests"><span class="glyphicon glyphicon-pencil"></span>Add more tests</h2>
+<h2><span class="glyphicon glyphicon-pencil"></span>Add more tests</h2>
 </div>
 <div class="panel-body">
 <p>Add more tests to <code>test_whiten.py</code> and take care of the edge cases.</p>

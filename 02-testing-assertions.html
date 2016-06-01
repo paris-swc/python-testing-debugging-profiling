@@ -30,7 +30,7 @@
           <h2 class="subtitle">Assertions</h2>
           <section class="objectives panel panel-warning">
 <div class="panel-heading">
-<h2 id="learning-objectives"><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
+<h2><span class="glyphicon glyphicon-certificate"></span>Learning Objectives</h2>
 </div>
 <div class="panel-body">
 <ul>
@@ -75,8 +75,8 @@ AssertionError:</code></pre>
     data_max = numpy.<span class="dt">max</span>(data)
     <span class="kw">assert</span> data_max &gt; data_min
     normalized_data = (data - data_min) / (data_max - data_min)
-    <span class="kw">assert</span> normalized_numpy.<span class="dt">min</span>(data) == <span class="fl">0.0</span>
-    <span class="kw">assert</span> normalized_numpy.<span class="dt">max</span>(data) == <span class="fl">1.0</span>
+    <span class="kw">assert</span> numpy.<span class="dt">min</span>(normalized_data) == <span class="fl">0.0</span>
+    <span class="kw">assert</span> numpy.<span class="dt">max</span>(normalized_data) == <span class="fl">1.0</span>
     rescaled_data = lower + (upper - lower) * normalized_data
     <span class="kw">return</span> rescaled_data</code></pre>
 <p>Let’s run our function and make sure that none of the assertions is raised:</p>
@@ -92,8 +92,8 @@ AssertionError:</code></pre>
     data_max = numpy.<span class="dt">max</span>(data)
     <span class="kw">assert</span> data_max &gt; data_min
     normalized_data = data / (data_max - data_min) - data_min / (data_max - data_min)
-    <span class="kw">assert</span> normalized_numpy.<span class="dt">min</span>(data) == <span class="fl">0.0</span>
-    <span class="kw">assert</span> normalized_numpy.<span class="dt">max</span>(data) == <span class="fl">1.0</span>
+    <span class="kw">assert</span> numpy.<span class="dt">min</span>(normalized_data) == <span class="fl">0.0</span>
+    <span class="kw">assert</span> numpy.<span class="dt">max</span>(normalized_data) == <span class="fl">1.0</span>
     rescaled_data = lower + (upper - lower) * normalized_data
     <span class="kw">return</span> rescaled_data</code></pre>
 <p>This should not have changed anything, but in fact the assertion is now failing:</p>
@@ -106,8 +106,8 @@ AssertionError:</code></pre>
 
 &lt;ipython-input-2-49242bbbe0b1&gt; in rescale(data, lower, upper)
       5     normalized_data = data / (data_max - data_min) - data_min / (data_max - data_min)
-      6     assert normalized_numpy.min(data) == 0.0
-----&gt; 7     assert normalized_numpy.max(data) == 1.0
+      6     assert numpy.min(normalized_data) == 0.0
+----&gt; 7     assert numpy.max(normalized_data) == 1.0
       8     rescaled_data = lower + (upper - lower) * normalized_data
       9     return rescaled_data
 
@@ -123,7 +123,7 @@ assert_allclose(values, <span class="fl">0.3</span>, rtol=<span class="fl">1e-12
 <p>There are more helpful <code>assert_…</code> functions in that package, we’ll use them later in the lesson.</p>
 <section class="challenge panel panel-success">
 <div class="panel-heading">
-<h2 id="the-final-touch"><span class="glyphicon glyphicon-pencil"></span>The final touch</h2>
+<h2><span class="glyphicon glyphicon-pencil"></span>The final touch</h2>
 </div>
 <div class="panel-body">
 <ul>
