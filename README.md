@@ -1,6 +1,13 @@
 # Testing, debugging, and profiling
 
-TODO
+Website: http://paris-swc.github.io/python-testing-debugging-profiling/
+
+Teaching material for a
+"[Software-Carpentry](http://software-carpentry.org/)-style" course taught at
+the ["Scientific Programming with Python and Software Engineering Best Practices"
+workshop](http://telecom-python.telenczuk.pl/) ([Télécom ParisTech](http://www.telecom-paristech.fr/eng), 28-29 Apr 2016).
+
+Layout based on the Software Carpentry [lesson template](https://github.com/swcarpentry/lesson-template).
 
 ## Acknowledgments
 
